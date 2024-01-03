@@ -1,0 +1,32 @@
+poller:
+  debug: false
+  quiet: false
+  plugins: []
+
+prometheus:
+  disable:       false
+  http_listen:   "0.0.0.0:9130"
+  ssl_cert_path: ""
+  ssl_key_path:  ""
+  report_errors: false
+  buffer:        50
+
+unifi:
+  dynamic: false
+  defaults:
+    url:  "https://master.home:8443/"
+{{- with nomadVar "nomad/jobs/prometheus" }}
+    user: {{ .unifi_user }}
+    pass: {{ .unifi_pass }}
+{{- end }}
+    sites:
+      - all
+    timeout: 60s
+    save_ids:    false
+    save_events: false
+    save_alarms: false
+    save_anomalies: false
+    save_dpi:    true
+    save_sites:  true
+    hash_pii:    false
+    verify_ssl:  false

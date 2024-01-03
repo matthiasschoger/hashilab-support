@@ -1,8 +1,8 @@
 
 plugin_id   = "nfs"
 type        = "csi"
-id          = "SERVICE_NAME"
-name        = "SERVICE_NAME"
+id          = "loki"
+name        = "Loki"
 
 capability {
 	access_mode = "single-node-writer"
@@ -12,12 +12,12 @@ capability {
 context {
   server = "storage.home"
   share = "/volume2/homelab"
-  subDir = "SERVICE_NAME"
+  subDir = "loki"
   mountPermissions = "0"  
 }
 
 mount_options {
   fs_type = "nfs"
-  mount_flags = [ "timeo=30", "vers=4.1", "nolock", "sync" ]
+  mount_flags = [ "timeo=30", "vers=4.1", "nolock" ]
 }
 

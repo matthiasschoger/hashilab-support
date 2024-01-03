@@ -1,0 +1,148 @@
+# my global config
+global:
+#  scrape_interval: 30s # Set the scrape interval to every 30 seconds. Default is every 1 minute.
+  evaluation_interval: 1m # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - alert.yml
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# scrape configurations
+scrape_configs:
+  - job_name: node-exporter-host
+    scrape_interval: 15s
+    # metrics_path: /metrics # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+      - targets:
+          - 'storage.home:9100'
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
+
+  - job_name: node-exporter-consul
+    scrape_interval: 15s
+    consul_sd_configs:
+    - server: 'consul.service.consul:8500'
+      services: ['node-exporter']
+    relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
+    - source_labels: [__meta_consul_node]
+      regex: (.*)
+      replacement: ${1}.home
+      target_label: instance
+
+  - job_name: nomad
+    consul_sd_configs:
+    - server: 'consul.service.consul:8500'
+      services: ['nomad-client', 'nomad']
+    relabel_configs:
+    - source_labels: [__meta_consul_service]
+      action: drop
+      regex: (.+)-sidecar-proxy
+    - source_labels: ['__meta_consul_tags']
+      regex: '(.*)http(.*)'
+      action: keep
+    metrics_path: /v1/metrics
+    params:
+      format: ['prometheus']
+
+  - job_name: envoy-consul
+    scrape_interval: 15s
+    consul_sd_configs:
+    - server: 'consul.service.consul:8500'
+    relabel_configs:
+    - source_labels: [__meta_consul_service]
+      action: drop
+      regex: (.+)-sidecar-proxy
+    - source_labels: [__meta_envoy_cluster_name] # drop metrics for Envoy internal traffic
+      action: drop
+      regex: local_agent
+    - source_labels: [__meta_envoy_cluster_name]
+      action: drop
+      regex: local_app
+    - source_labels: [__meta_envoy_cluster_name]
+      action: drop
+      regex: self_admin
+    - source_labels: [__meta_consul_service_metadata_envoy_metrics_port]
+      action: keep
+      regex: (.+)
+    - source_labels: [__address__, __meta_consul_service_metadata_envoy_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
+  - job_name: envoy_prometheus # for the local Prometheus proxy, prometheus cannot connect to it's own proxy
+    static_configs: 
+      - targets:
+          - 'localhost:9102'
+
+  - job_name: 'consul'
+    metrics_path: /v1/agent/metrics
+    params:
+      format: ['prometheus']
+    static_configs:
+      - targets:
+          - 'compute1.home:8500'
+          - 'compute2.home:8500'
+          - 'master.home:8500'
+
+  - job_name: 'core-dns'
+    static_configs:
+      - targets:
+          - 'compute1.home:9153'
+          - 'compute2.home:9153'
+
+  - job_name: 'traefik'
+    static_configs:
+      - targets:
+          - 'traefik-api.service.consul:8080'
+
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - 'prometheus.lab.home'
+
+  - job_name: cadvisor
+    static_configs:
+    - targets:
+      - storage.home:9117
+
+# https://mariushosting.com/monitor-your-synology-with-grafana-and-prometheus-dashboard/
+  - job_name: snmp
+    static_configs:
+      - targets: 
+          - 'storage.home'
+    metrics_path: /snmp
+    params:
+      auth: [snmp_v3]
+      module: [synology]
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__param_target]
+#       wtf? This configures the SNMP Exporter endpoint      
+        regex: (.*)
+        replacement: localhost:9116
+        target_label: __address__
+
+  - job_name: 'unifipoller'
+    static_configs:
+    - targets: ['localhost:9130']
+

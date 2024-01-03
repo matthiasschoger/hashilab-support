@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:  
+  node-exporter:
+    privileged: true
+    image: "prom/node-exporter:latest"
+    container_name: "Node-Exporter"
+    restart: unless-stopped
+
+    network_mode: bridge
+    ports:
+      - 9100:9100
+      - 9111:9112
+
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude"
+      - "^/(rootfs/)?(dev|etc|host|proc|run|sys|volume1)($$|/)"
+
+
+  cadvisor:
+    privileged: true
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: "cAdvisor"
+    restart: unless-stopped
+
+    network_mode: bridge
+    ports:
+      - 9117:8080
+
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+
+    command:
+      - "--docker_only"
+      - "--disable_metrics=percpu,cpu_topology,sched,accelerator,hugetlb,advtcp,disk,diskIO"
+      - "--housekeeping_interval=10s"
