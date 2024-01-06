@@ -66,6 +66,10 @@ job "node-exporter" {
         ]
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       resources {
         memory = 100
         cpu    = 100

@@ -81,6 +81,10 @@ job "loki" {
         ]
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       template {
         data        = file("config.yml")
         destination = "local/config.yml"

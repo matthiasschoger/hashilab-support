@@ -80,6 +80,10 @@ job "prometheus" {
         ]      
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       template {
         data        = file("config/prometheus.yaml")
         destination = "local/prometheus/prometheus.yaml"
@@ -164,6 +168,10 @@ job "prometheus" {
         ]
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       template {
         data        = file("config/snmp-synology.yaml")
         destination = "local/snmp-synology.yaml"
@@ -234,6 +242,10 @@ job "prometheus" {
         args  = [
           "--config=/local/unpoller.yaml"
         ]
+      }
+
+      env {
+        TZ = "Europe/Berlin"
       }
 
       template {

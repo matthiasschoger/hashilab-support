@@ -81,6 +81,10 @@ job "portainer" {
         ports = ["http","agent"]
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       resources {
         memory = 50
         cpu    = 50

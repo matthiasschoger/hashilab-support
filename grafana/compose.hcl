@@ -84,6 +84,7 @@ job "grafana" {
         GF_LOG_LEVEL = "INFO"
         GF_LOG_MODE = "console"
         GF_PATHS_PROVISIONING = "/etc/grafana/provisioning"
+        TZ = "Europe/Berlin"
       }
 
       resources {

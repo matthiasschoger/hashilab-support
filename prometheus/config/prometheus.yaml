@@ -79,6 +79,10 @@ scrape_configs:
     - source_labels: [__meta_envoy_cluster_name]
       action: drop
       regex: self_admin
+#    - source_labels: [__meta_consul_source_service, __meta_consul_destination_service] # all node-exporters have "Prometheus" as destination service
+#      regex: node-exporter
+#      replacement: prometheus
+#      target_label: consul_destination_service
     - source_labels: [__meta_consul_service_metadata_envoy_metrics_port]
       action: keep
       regex: (.+)
