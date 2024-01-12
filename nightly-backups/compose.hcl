@@ -6,7 +6,7 @@ job "nightly-backups" {
   # requires that the databases have a backup Action defined which can be called by Nomad
 
   periodic {
-    crons            = ["0 1 * * * *"] # run every day at 1:00
+    crons            = ["0 3 * * * *"] # run every day at 3:00
     time_zone        = "Europe/Berlin"
     prohibit_overlap = true
   }
