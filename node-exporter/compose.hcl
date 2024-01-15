@@ -2,7 +2,7 @@ job "node-exporter" {
   datacenters = ["home"]
   type        = "system"
 
-  group "prometheus" {
+  group "node-exporter" {
 
     restart {
       attempts = 3
