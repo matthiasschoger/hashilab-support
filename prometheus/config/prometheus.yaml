@@ -114,7 +114,7 @@ scrape_configs:
   - job_name: 'traefik'
     static_configs:
       - targets:
-          - 'traefik-api.service.consul:8080'
+          - 'traefik-api.service.consul:18080'
 
   - job_name: prometheus
     static_configs:
