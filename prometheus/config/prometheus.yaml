@@ -90,6 +90,14 @@ scrape_configs:
       regex: ([^:]+)(?::\d+)?;(\d+)
       replacement: ${1}:${2}
       target_label: __address__
+    - source_labels: [__meta_consul_node]
+      regex: (.*)
+      replacement: ${1}.home
+      target_label: instance
+    - source_labels: [__meta_consul_service]
+      regex: "(.+)"
+      replacement: ${1}
+      target_label: "service_name"
   - job_name: envoy_prometheus # for the local Prometheus proxy, prometheus cannot connect to it's own proxy
     static_configs: 
       - targets:
@@ -105,16 +113,21 @@ scrape_configs:
           - 'compute2.home:8500'
           - 'master.home:8500'
 
+  - job_name: 'traefik'
+    consul_sd_configs:
+    - server: 'consul.service.consul:8500'
+      services: ['traefik-api']
+    relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
+
   - job_name: 'core-dns'
     static_configs:
       - targets:
           - 'compute1.home:9153'
           - 'compute2.home:9153'
-
-  - job_name: 'traefik'
-    static_configs:
-      - targets:
-          - 'traefik-api.service.consul:18080'
 
   - job_name: prometheus
     static_configs:
