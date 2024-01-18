@@ -58,6 +58,10 @@ scrape_configs:
     - source_labels: ['__meta_consul_tags']
       regex: '(.*)http(.*)'
       action: keep
+    - source_labels: [__meta_consul_node]
+      regex: (.*)
+      replacement: ${1}.home
+      target_label: instance
     metrics_path: /v1/metrics
     params:
       format: ['prometheus']
@@ -122,6 +126,10 @@ scrape_configs:
       regex: ([^:]+)(?::\d+)?;(\d+)
       replacement: ${1}:${2}
       target_label: __address__
+    - source_labels: [__meta_consul_node]
+      regex: (.*)
+      replacement: ${1}.home
+      target_label: instance
 
   - job_name: 'core-dns'
     static_configs:
