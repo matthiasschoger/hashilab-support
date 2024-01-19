@@ -110,12 +110,6 @@ job "prometheus" {
       value     = "compute"
     }
 
-    restart {
-      attempts = 3
-      delay = "1m"
-      mode = "fail"
-    }
-
     network {
       mode = "bridge"
 
@@ -184,12 +178,6 @@ job "prometheus" {
     constraint {
       attribute = "${node.class}"
       value     = "compute"
-    }
-
-    restart {
-      attempts = 3
-      delay = "1m"
-      mode = "fail"
     }
 
     network {
