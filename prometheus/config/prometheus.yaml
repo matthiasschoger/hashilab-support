@@ -140,7 +140,7 @@ scrape_configs:
   - job_name: prometheus
     static_configs:
       - targets:
-          - 'prometheus.lab.home'
+          - 'localhost:9090'
 
   - job_name: cadvisor
     static_configs:
