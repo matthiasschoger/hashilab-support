@@ -9,12 +9,6 @@ job "loki" {
       value     = "compute"
     }
 
-    restart {
-      attempts = 3
-      delay = "1m"
-      mode = "fail"
-    }
-
     ephemeral_disk {
       # Used to store index, cache, WAL
       # Nomad will try to preserve the disk between job updates

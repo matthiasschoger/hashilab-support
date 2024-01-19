@@ -4,12 +4,6 @@ job "promtail" {
 
   group "promtail" {
 
-    restart {
-      attempts = 3
-      delay = "1m"
-      mode = "fail"
-    }
-
     network {
       mode = "bridge"
 

@@ -9,12 +9,6 @@ job "diun" {
       value     = "compute"
     }
 
-    restart {
-      attempts = 2
-      delay = "1m"
-      mode = "fail"
-    }
-
     ephemeral_disk {
       size    = 300 # MB
       migrate = true

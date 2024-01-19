@@ -4,12 +4,6 @@ job "node-exporter" {
 
   group "node-exporter" {
 
-    restart {
-      attempts = 3
-      delay = "1m"
-      mode = "fail"
-    }
-
     network {
       mode = "bridge"
 
