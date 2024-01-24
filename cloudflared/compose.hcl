@@ -56,7 +56,7 @@ job "cloudflared" {
         args = [
           "tunnel",
           "--config", "/secrets/config.yaml",
-          "--loglevel", "debug",
+#          "--loglevel", "debug",
           "run", "home"
         ]
 
