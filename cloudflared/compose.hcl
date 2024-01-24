@@ -79,8 +79,8 @@ EOH
       }
 
       resources {
-        memory = 500
-        cpu    = 200
+        memory = 100
+        cpu    = 50
       }
     }
   }
