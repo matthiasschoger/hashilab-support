@@ -30,12 +30,8 @@ job "cloudflared" {
                         envoy_prometheus_bind_addr = "0.0.0.0:9102"
                     }
                     upstreams {
-                        destination_name = "traefik-inet-http"
+                        destination_name = "traefik-cloudflare"
                         local_bind_port  = 80
-                    }
-                    upstreams {
-                        destination_name = "traefik-inet-https"
-                        local_bind_port  = 443
                     }
                 }
             }
@@ -55,10 +51,12 @@ job "cloudflared" {
       config {
         image = "cloudflare/cloudflared:latest"
 
+        privileged = true
+
         args = [
           "tunnel",
           "--config", "/secrets/config.yaml",
-          "--no-autoupdate",
+          "--loglevel", "debug",
           "run", "home"
         ]
 

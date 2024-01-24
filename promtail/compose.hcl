@@ -56,7 +56,7 @@ job "promtail" {
       }
 
       resources {
-        memory = 100
+        memory = 150
         cpu    = 100
       }
 

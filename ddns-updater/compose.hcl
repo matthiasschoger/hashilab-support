@@ -15,9 +15,9 @@ job "ddns-updater" {
       port "envoy_metrics" { to = 9102 }
     }
 
-    // ephemeral_disk {
-    //   migrate = true
-    // }
+    ephemeral_disk {
+      migrate = true
+    }
 
     service {
         name = "ddns-updater"
@@ -84,38 +84,11 @@ job "ddns-updater" {
             "provider": "cloudflare",
             "zone_identifier": "{{- .zone_id }}",
             "domain": "schoger.net",
-            "host": "bitwarden",
+            "host": "wg",
             "ttl": 600,
             "token": "{{- .token }}",
             "ip_version": "ipv4"
-        },
-        {
-            "provider": "cloudflare",
-            "zone_identifier": "{{- .zone_id }}",
-            "domain": "schoger.net",
-            "host": "bitwarden",
-            "ttl": 600,
-            "token": "{{- .token }}",
-            "ip_version": "ipv6"
-        },
-        {
-            "provider": "cloudflare",
-            "zone_identifier": "{{- .zone_id }}",
-            "domain": "schoger.net",
-            "host": "www",
-            "ttl": 600,
-            "token": "{{- .token }}",
-            "ip_version": "ipv4"
-        },
-        {
-            "provider": "cloudflare",
-            "zone_identifier": "{{- .zone_id }}",
-            "domain": "schoger.net",
-            "host": "www",
-            "ttl": 600,
-            "token": "{{- .token }}",
-            "ip_version": "ipv6"
-        }    
+        }
     ]
 }
 {{- end }}
