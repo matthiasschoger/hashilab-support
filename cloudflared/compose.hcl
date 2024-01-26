@@ -12,12 +12,12 @@ job "cloudflared" {
     network {
       mode = "bridge"
 
-      port "metrics" { }
+      port "metrics" { to = 9100 }
       port "envoy_metrics" { to = 9102 }
     }
 
     service {
-        name = "cloudflared-ingress"
+        name = "ingress-cloudflare"
         
         meta {
             envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
@@ -51,13 +51,11 @@ job "cloudflared" {
       config {
         image = "cloudflare/cloudflared:latest"
 
-        privileged = true
-
         args = [
           "tunnel",
           "--config", "/secrets/config.yaml",
 #          "--loglevel", "debug",
-          "run", "home"
+          "run", "home-lab"
         ]
 
         ports = ["metrics"]
@@ -70,9 +68,8 @@ job "cloudflared" {
 
 tunnel: {{ .tunnel }}
 token: {{ .token }}
-warp-routing:
-    enabled: true
-metrics: localhost:{{ env "NOMAD_PORT_metrics" }}
+
+metrics: 0.0.0.0:9100
 
 {{- end }}
 EOH

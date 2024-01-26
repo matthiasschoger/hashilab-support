@@ -80,7 +80,7 @@ job "portainer" {
       }
 
       resources {
-        memory = 50
+        memory = 100
         cpu    = 50
       }
 

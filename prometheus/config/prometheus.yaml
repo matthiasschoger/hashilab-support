@@ -83,10 +83,6 @@ scrape_configs:
     - source_labels: [__meta_envoy_cluster_name]
       action: drop
       regex: self_admin
-#    - source_labels: [__meta_consul_source_service, __meta_consul_destination_service] # all node-exporters have "Prometheus" as destination service
-#      regex: node-exporter
-#      replacement: prometheus
-#      target_label: consul_destination_service
     - source_labels: [__meta_consul_service_metadata_envoy_metrics_port]
       action: keep
       regex: (.+)
@@ -121,6 +117,20 @@ scrape_configs:
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['traefik-api']
+    relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
+    - source_labels: [__meta_consul_node]
+      regex: (.*)
+      replacement: ${1}.home
+      target_label: instance
+
+  - job_name: 'cloudflared'
+    consul_sd_configs:
+    - server: 'consul.service.consul:8500'
+      services: ['ingress-cloudflare']
     relabel_configs:
     - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
       regex: ([^:]+)(?::\d+)?;(\d+)
