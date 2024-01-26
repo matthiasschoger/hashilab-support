@@ -83,7 +83,7 @@ job "grafana" {
 
       resources {
         cpu    = 400
-        memory = 300
+        memory = 150
       }
 
       volume_mount {
