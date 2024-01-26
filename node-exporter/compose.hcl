@@ -17,14 +17,13 @@ job "node-exporter" {
       port = 9100
 
       meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
         metrics_port = "${NOMAD_HOST_PORT_metrics}"
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
       }
       connect {
         sidecar_service {
           proxy {
             config {
-              protocol = "http"
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
             }
             expose {

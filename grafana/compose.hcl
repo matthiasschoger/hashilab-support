@@ -42,7 +42,6 @@ job "grafana" {
         sidecar_service {
           proxy {
             config {
-              protocol = "http"
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
             }
             # link Loki + Prometheus for all the SDN goodness
