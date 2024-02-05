@@ -93,7 +93,7 @@ EOH
       }
     }
   }
-/*
+
   group "vector" {
 
     constraint {
@@ -216,5 +216,4 @@ EOH
       read_only = true
     }
   }
-*/
 }
