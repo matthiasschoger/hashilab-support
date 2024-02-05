@@ -96,11 +96,6 @@ EOH
 
   group "vector" {
 
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
     network {
       mode = "bridge"
 

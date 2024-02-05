@@ -235,7 +235,7 @@ job "prometheus" {
       }
 
       resources {
-        cpu    = 50
+        cpu    = 200
         memory = 100
       }
     }
