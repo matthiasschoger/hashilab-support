@@ -23,8 +23,8 @@ job "nightly-backups" {
 
       config {
         command = "/bin/sh"
-        # command line arguments which call Nomad to execute the backup Actions
-        # add additional backup actions as desired
+        # command line arguments which call Nomad to execute the backup Action
+        # add additional backup Actions as desired
         args    = ["-c", <<EOF
 echo "backing up Unifi Network MongoDB"
 nomad action -job=unifi-network -group=mongodb -task=mongodb backup-mongodb
@@ -35,6 +35,7 @@ EOF
         ]
       }
 
+      # provide Nomad token with the necessary rights to execute the backup Actions
       template {
         destination = "secrets/variables.env"
         env             = true
