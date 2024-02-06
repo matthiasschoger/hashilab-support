@@ -67,10 +67,6 @@ job "prometheus" {
         image = "prom/prometheus:latest"
 
         args = ["--config.file", "/local/prometheus/prometheus.yaml"]
-
-        volumes = [
-          "/etc/ssl/certs:/etc/ssl/certs:ro"    # use TLS certs from host OS, including the homelab cert
-        ]      
       }
 
       env {
@@ -83,7 +79,7 @@ job "prometheus" {
       }
 
       resources {
-        cpu    = 200
+        cpu    = 500
         memory = 1000
       }
 
@@ -235,7 +231,7 @@ job "prometheus" {
       }
 
       resources {
-        cpu    = 200
+        cpu    = 50
         memory = 100
       }
     }

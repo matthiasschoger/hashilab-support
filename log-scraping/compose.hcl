@@ -56,7 +56,7 @@ job "log-collection" {
       }
 
       resources {
-        memory = 150
+        memory = 100
         cpu    = 100
       }
 
@@ -150,7 +150,7 @@ EOH
       }
 
       resources {
-        memory = 150
+        memory = 100
         cpu    = 100
       }
 
@@ -185,11 +185,11 @@ sinks:
     healthcheck:
       enabled: true
     labels:
+      app: "containers"
       # See https://vector.dev/docs/reference/vrl/expressions/#path-example-nested-path
       job: "{{label.\"com.hashicorp.nomad.job_name\" }}"
       task: "{{label.\"com.hashicorp.nomad.task_name\" }}"
       group: "{{label.\"com.hashicorp.nomad.task_group_name\" }}"
-#      namespace: "{{label.\"com.hashicorp.nomad.namespace\" }}"
       node: "{{label.\"com.hashicorp.nomad.node_name\" }}"
     # remove fields that have been converted to labels to avoid having the field twice
     remove_label_fields: true
