@@ -1,7 +1,7 @@
 auth_enabled: false
 
 server:
-  log_level: info
+  log_level: warn
   http_listen_port: 3100
 
 ingester:
@@ -60,3 +60,5 @@ table_manager:
   retention_deletes_enabled: false
   retention_period: 0s
 
+query_range:
+  parallelise_shardable_queries: false # helps with "context canceled" messages I'm getting

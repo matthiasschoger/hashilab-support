@@ -46,7 +46,12 @@ job "cloudflare-dyndns" {
       driver = "docker"
 
       config {
+        # receives a callback from the router when the IP changes -> update Cloudflare DNS entries
+
         image = "ghcr.io/cromefire/fritzbox-cloudflare-dyndns:latest"
+
+        # example URL: 192.168.0.3:1080/ip?v4=<ipaddr>&v6=<ip6addr>&prefix=<ip6lanprefix>&username=<username>&password=<pass>
+        # adjust to your router as needed
       }
 
       env {
@@ -63,6 +68,7 @@ DYNDNS_SERVER_USERNAME = "ddns"
 DYNDNS_SERVER_PASSWORD = "ddns"
 CLOUDFLARE_API_EMAIL = "{{- .email }}"
 CLOUDFLARE_API_TOKEN = "{{- .token }}"
+CLOUDFLARE_ZONES_IPV4 = "{{- .zone }}"
 CLOUDFLARE_ZONES_IPV6 = "{{- .zone }}"
 {{- end }}
 EOH

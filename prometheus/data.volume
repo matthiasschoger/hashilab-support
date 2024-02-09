@@ -12,7 +12,7 @@ capability {
 context {
   server = "storage.home"
   share = "/volume2/homelab"
-  subDir = "prometheus/data"
+  subDir = "prometheus"
   mountPermissions = "0"  
 }
 

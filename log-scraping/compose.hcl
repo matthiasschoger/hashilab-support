@@ -166,18 +166,18 @@ data_dir: "alloc/data/vector/"
 api:
   enabled: false
 sources:
-  logs:
+  docker:
     type: "docker_logs"
 sinks:
   out:
     type: "console"
-    inputs: ["logs"]
+    inputs: ["docker"]
     encoding:
       codec: "json"
 sinks:
   loki:
     type: "loki"
-    inputs: ["logs"]
+    inputs: ["docker"]
     endpoint: "http://localhost:3100"
     compression: "snappy"
     encoding:
