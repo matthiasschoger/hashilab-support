@@ -59,7 +59,7 @@ job "cloudflare-dyndns" {
       }
 
       template {
-        destination = "local/variables.env"
+        destination = "secrets/variables.env"
         env = true
         data = <<EOH
 {{- with nomadVar "nomad/jobs/cloudflare-dyndns" }}

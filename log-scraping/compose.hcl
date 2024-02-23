@@ -56,7 +56,7 @@ job "log-collection" {
       }
 
       resources {
-        memory = 100
+        memory = 150
         cpu    = 100
       }
 
@@ -139,7 +139,7 @@ EOH
       driver = "docker"
 
       config {
-        image = "timberio/vector:latest-alpine"
+        image = "timberio/vector:latest-debian"
       }
 
       env {
@@ -166,24 +166,38 @@ data_dir: "alloc/data/vector/"
 api:
   enabled: false
 sources:
-  docker:
+  docker_logs:
     type: "docker_logs"
+
+transforms:
+  docker_transformed:
+    inputs: 
+      - "docker_logs"
+    type: "remap"
+    source: |
+      .matthias, err = parse_json(replace(.message, r'([^\x00-\x7F])', "\\\\$$1") ?? .message)
+
 sinks:
   out:
     type: "console"
-    inputs: ["docker"]
+    inputs: 
+      - "docker_logs"
+    target: "stdout"
     encoding:
       codec: "json"
 sinks:
   loki:
     type: "loki"
-    inputs: ["docker"]
     endpoint: "http://localhost:3100"
+    inputs: 
+      - "docker_logs"
     compression: "snappy"
     encoding:
       codec: "json"
     healthcheck:
       enabled: true
+    # remove fields that have been converted to labels to avoid having the field twice
+    remove_label_fields: true
     labels:
       app: "containers"
       # See https://vector.dev/docs/reference/vrl/expressions/#path-example-nested-path
@@ -191,8 +205,6 @@ sinks:
       task: "{{label.\"com.hashicorp.nomad.task_name\" }}"
       group: "{{label.\"com.hashicorp.nomad.task_group_name\" }}"
       node: "{{label.\"com.hashicorp.nomad.node_name\" }}"
-    # remove fields that have been converted to labels to avoid having the field twice
-    remove_label_fields: true
 EOH
       }
 
