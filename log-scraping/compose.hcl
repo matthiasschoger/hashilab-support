@@ -169,13 +169,13 @@ sources:
   docker_logs:
     type: "docker_logs"
 
-transforms:
-  docker_transformed:
-    inputs: 
-      - "docker_logs"
-    type: "remap"
-    source: |
-      .matthias, err = parse_json(replace(.message, r'([^\x00-\x7F])', "\\\\$$1") ?? .message)
+#transforms:
+#  docker_transformed:
+#    inputs: 
+#      - "docker_logs"
+#    type: "remap"
+#    source: |
+#      .matthias, err = parse_json(replace(.message, r'([^\x00-\x7F])', "\\\\$$1") ?? .message)
 
 sinks:
   out:

@@ -40,6 +40,537 @@
         "type": "prometheus",
         "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
       },
+      "description": "Spikes on this graph that are missing from the LAN graph indicate gateway-originated traffic, like a scheduled speed test. Rx is on the negative axis.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "bytes / second",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/Tx$/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "10.2.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "rate(unpoller_device_wan_receive_bytes_total{}[$__rate_interval])",
+          "interval": "",
+          "legendFormat": "Bytes Rx",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "rate(unpoller_device_wan_transmit_bytes_total{}[$__rate_interval])",
+          "interval": "",
+          "legendFormat": "Bytes Tx",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "unpoller_device_wan_transmit_rate_bytes{}",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "Bytes Tx",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "unpoller_device_wan_receive_rate_bytes{}",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "Bytes Rx",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "WAN Throughput",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "System dashboard",
+              "url": "https://mon.cinarra.com/d/b4FAZ7Mmz/system?orgId=1&var-env=$env&var-instance=${__data.fields.Client}"
+            }
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Node ID"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Node class"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Eligibility"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 101
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.width",
+                "value": 87
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.width",
+                "value": 97
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Disk"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Client"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 172
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Client"
+          }
+        ]
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "100 -\nnomad_client_unallocated_cpu{}\n/\n(nomad_client_allocated_cpu{}\n+ nomad_client_unallocated_cpu{}) * 100",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "cpu utilization",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "100 -\nnomad_client_unallocated_memory{}\n/\n(nomad_client_allocated_memory{}\n+ nomad_client_unallocated_memory{}) * 100",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "memory utilization",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "100 -\nnomad_client_unallocated_disk{}\n/\n(nomad_client_allocated_disk{}\n+ nomad_client_unallocated_disk{}) * 100",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "disk utilization",
+          "refId": "E"
+        }
+      ],
+      "title": "Nomad clients - Resources allocated",
+      "transformations": [
+        {
+          "id": "seriesToColumns",
+          "options": {
+            "byField": "instance"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "instance",
+                "node_class",
+                "node_scheduling_eligibility",
+                "Value #C",
+                "Value #D",
+                "Value #E",
+                "node_status"
+              ],
+              "pattern": "instance|node_.* 1|Value .*"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "node_class 1": true,
+              "node_class 2": true,
+              "node_class 3": true,
+              "node_id 1": true,
+              "node_pool": true,
+              "node_scheduling_eligibility 2": true,
+              "node_scheduling_eligibility 3": true,
+              "node_status 2": true,
+              "node_status 3": true
+            },
+            "indexByName": {
+              "Value #A": 5,
+              "Value #B": 6,
+              "instance": 0,
+              "node_class 1": 2,
+              "node_id 1": 1,
+              "node_scheduling_eligibility 1": 4,
+              "node_status 1": 3
+            },
+            "renameByName": {
+              "Value #A": "Uptime",
+              "Value #B": "Allocs",
+              "Value #C": "CPU",
+              "Value #D": "Memory",
+              "Value #E": "Disk",
+              "instance": "Client",
+              "node_class": "Node class",
+              "node_class 1": "Node class",
+              "node_id": "Node ID",
+              "node_id 1": "Node ID",
+              "node_scheduling_eligibility": "Elegibility",
+              "node_scheduling_eligibility 1": "Eligibility",
+              "node_status": "Status",
+              "node_status 1": "Status"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+      },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -60,8 +591,7 @@
               }
             ]
           },
-          "unit": "none",
-          "unitScale": true
+          "unit": "none"
         },
         "overrides": [
           {
@@ -229,10 +759,10 @@
         ]
       },
       "gridPos": {
-        "h": 6,
+        "h": 5,
         "w": 6,
         "x": 0,
-        "y": 1
+        "y": 6
       },
       "id": 9,
       "options": {
@@ -247,9 +777,14 @@
           "show": false
         },
         "showHeader": true,
-        "sortBy": []
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Name"
+          }
+        ]
       },
-      "pluginVersion": "10.3.1",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -355,20 +890,17 @@
               }
             ]
           },
-          "unit": "none",
-          "unitScale": true
+          "unit": "none"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 5,
         "w": 3,
         "x": 6,
-        "y": 1
+        "y": 6
       },
       "id": 8,
-      "links": [],
-      "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -385,7 +917,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.3.1",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -429,16 +961,15 @@
                 "value": 1
               }
             ]
-          },
-          "unitScale": true
+          }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 5,
         "w": 3,
         "x": 9,
-        "y": 1
+        "y": 6
       },
       "id": 7,
       "options": {
@@ -457,7 +988,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "10.3.1",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -481,371 +1012,6 @@
         "type": "prometheus",
         "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
       },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "filterable": false,
-            "inspect": false
-          },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "System dashboard",
-              "url": "https://mon.cinarra.com/d/b4FAZ7Mmz/system?orgId=1&var-env=$env&var-instance=${__data.fields.Client}"
-            }
-          ],
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unitScale": true
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Node ID"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 130
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Node class"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 90
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Eligibility"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 100
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Status"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 80
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "CPU"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "mode": "continuous-GrYlRd"
-                }
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "mode": "gradient",
-                  "type": "color-background"
-                }
-              },
-              {
-                "id": "min",
-                "value": 0
-              },
-              {
-                "id": "max",
-                "value": 100
-              },
-              {
-                "id": "custom.width",
-                "value": 70
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Memory"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "mode": "continuous-GrYlRd"
-                }
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "mode": "gradient",
-                  "type": "color-background"
-                }
-              },
-              {
-                "id": "min",
-                "value": 0
-              },
-              {
-                "id": "max",
-                "value": 100
-              },
-              {
-                "id": "custom.width",
-                "value": 70
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Disk"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "mode": "continuous-GrYlRd"
-                }
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "mode": "gradient",
-                  "type": "color-background"
-                }
-              },
-              {
-                "id": "min",
-                "value": 0
-              },
-              {
-                "id": "max",
-                "value": 100
-              },
-              {
-                "id": "custom.width",
-                "value": 70
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Client"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 153
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Elegibility"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 102
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 12,
-        "x": 12,
-        "y": 1
-      },
-      "id": 10,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "10.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "100 -\nnomad_client_unallocated_cpu{}\n/\n(nomad_client_allocated_cpu{}\n+ nomad_client_unallocated_cpu{}) * 100",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "cpu utilization",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "100 -\nnomad_client_unallocated_memory{}\n/\n(nomad_client_allocated_memory{}\n+ nomad_client_unallocated_memory{}) * 100",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "memory utilization",
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "100 -\nnomad_client_unallocated_disk{}\n/\n(nomad_client_allocated_disk{}\n+ nomad_client_unallocated_disk{}) * 100",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "disk utilization",
-          "refId": "E"
-        }
-      ],
-      "title": "Nomad clients - Resources allocated",
-      "transformations": [
-        {
-          "id": "seriesToColumns",
-          "options": {
-            "byField": "instance"
-          }
-        },
-        {
-          "id": "filterFieldsByName",
-          "options": {
-            "include": {
-              "names": [
-                "instance",
-                "node_class",
-                "node_scheduling_eligibility",
-                "Value #C",
-                "Value #D",
-                "Value #E",
-                "node_status"
-              ],
-              "pattern": "instance|node_.* 1|Value .*"
-            }
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "node_class 1": true,
-              "node_class 2": true,
-              "node_class 3": true,
-              "node_id 1": true,
-              "node_pool": true,
-              "node_scheduling_eligibility 2": true,
-              "node_scheduling_eligibility 3": true,
-              "node_status 2": true,
-              "node_status 3": true
-            },
-            "indexByName": {
-              "Value #A": 5,
-              "Value #B": 6,
-              "instance": 0,
-              "node_class 1": 2,
-              "node_id 1": 1,
-              "node_scheduling_eligibility 1": 4,
-              "node_status 1": 3
-            },
-            "renameByName": {
-              "Value #A": "Uptime",
-              "Value #B": "Allocs",
-              "Value #C": "CPU",
-              "Value #D": "Memory",
-              "Value #E": "Disk",
-              "instance": "Client",
-              "node_class": "Node class",
-              "node_class 1": "Node class",
-              "node_id": "Node ID",
-              "node_id 1": "Node ID",
-              "node_scheduling_eligibility": "Elegibility",
-              "node_scheduling_eligibility 1": "Eligibility",
-              "node_status": "Status",
-              "node_status 1": "Status"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -859,8 +1025,8 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -898,8 +1064,7 @@
               }
             ]
           },
-          "unit": "percent",
-          "unitScale": true
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -907,7 +1072,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 7
+        "y": 11
       },
       "id": 2,
       "options": {
@@ -981,12 +1146,25 @@
             "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
           },
           "editorMode": "code",
-          "expr": "(node_memory_MemTotal_bytes{instance=\"unifi.home\"} - node_memory_MemFree_bytes{instance=\"unifi.home\"} - (node_memory_Cached_bytes{instance=\"unifi.home\"} + node_memory_Buffers_bytes{instance=\"unifi.home\"} + node_memory_SReclaimable_bytes{instance=\"unifi.home\"})) / node_memory_MemTotal_bytes{instance=\"unifi.home\"} * 100",
+          "expr": "(node_memory_MemTotal_bytes{instance=\"dmz1.home\"} - node_memory_MemFree_bytes{instance=\"dmz1.home\"} - (node_memory_Cached_bytes{instance=\"dmz1.home\"} + node_memory_Buffers_bytes{instance=\"dmz1.home\"} + node_memory_SReclaimable_bytes{instance=\"dmz1.home\"})) / node_memory_MemTotal_bytes{instance=\"dmz1.home\"} * 100",
           "hide": false,
           "instant": false,
-          "legendFormat": "UDM",
+          "legendFormat": "Dmz1",
           "range": true,
           "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "(node_memory_MemTotal_bytes{instance=\"dmz2.home\"} - node_memory_MemFree_bytes{instance=\"dmz2.home\"} - (node_memory_Cached_bytes{instance=\"dmz2.home\"} + node_memory_Buffers_bytes{instance=\"dmz2.home\"} + node_memory_SReclaimable_bytes{instance=\"dmz2.home\"})) / node_memory_MemTotal_bytes{instance=\"dmz2.home\"} * 100",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Dmz2",
+          "range": true,
+          "refId": "F"
         }
       ],
       "title": "Memory usage",
@@ -1010,7 +1188,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -1049,8 +1227,7 @@
               }
             ]
           },
-          "unit": "percent",
-          "unitScale": true
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -1058,7 +1235,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 7
+        "y": 11
       },
       "id": 1,
       "maxDataPoints": 100,
@@ -1133,12 +1310,25 @@
             "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
           },
           "editorMode": "code",
-          "expr": "(sum by(instance) (irate(node_cpu_seconds_total{instance=\"unifi.home\", mode!=\"idle\"}[$__rate_interval])) * 100) / on(instance) sum by(instance) (irate(node_cpu_seconds_total{instance=\"unifi.home\"}[$__rate_interval])) ",
+          "expr": "(sum by(instance) (irate(node_cpu_seconds_total{instance=\"dmz1.home\", mode!=\"idle\"}[$__rate_interval])) * 100) / on(instance) sum by(instance) (irate(node_cpu_seconds_total{instance=\"dmz1.home\"}[$__rate_interval])) ",
           "hide": false,
           "instant": false,
-          "legendFormat": "UDM",
+          "legendFormat": "Dmz1",
           "range": true,
           "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "(sum by(instance) (irate(node_cpu_seconds_total{instance=\"dmz2.home\", mode!=\"idle\"}[$__rate_interval])) * 100) / on(instance) sum by(instance) (irate(node_cpu_seconds_total{instance=\"dmz2.home\"}[$__rate_interval])) ",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Dmz2",
+          "range": true,
+          "refId": "F"
         }
       ],
       "title": "CPU Usage",
@@ -1164,7 +1354,523 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 40,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy Iowait"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy IRQs"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy User"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Idle"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#7EB26D",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy System"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy Other"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#6D1F62",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode=\"system\", instance=\"compute1.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute1.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "Busy System",
+          "range": true,
+          "refId": "System",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode=~\".*irq\", instance=\"compute1.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute1.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "Busy IRQs",
+          "range": true,
+          "refId": "IRQs",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode!='idle',mode!='system',mode!='iowait',mode!='irq',mode!='softirq', instance=\"compute1.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute1.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "Busy User",
+          "range": true,
+          "refId": "User",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode=\"iowait\", instance=\"compute1.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute1.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Busy Iowait",
+          "range": true,
+          "refId": "IOWait",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode=\"idle\", instance=\"compute1.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute1.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": true,
+          "intervalFactor": 1,
+          "legendFormat": "Idle",
+          "range": true,
+          "refId": "Idle",
+          "step": 240
+        }
+      ],
+      "title": "CPU Details - compute1.home",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy Iowait"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy IRQs"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy User"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Idle"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#7EB26D",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy System"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Busy Other"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#6D1F62",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode=\"system\", instance=\"compute2.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute2.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "Busy System",
+          "range": true,
+          "refId": "System",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode=~\".*irq\", instance=\"compute2.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute2.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "Busy IRQs",
+          "range": true,
+          "refId": "IRQs",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode!='idle',mode!='system',mode!='iowait',mode!='irq',mode!='softirq', instance=\"compute2.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute2.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "Busy User",
+          "range": true,
+          "refId": "User",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode=\"iowait\", instance=\"compute2.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute2.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Busy Iowait",
+          "range": true,
+          "refId": "IOWait",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(instance) (irate(node_cpu_seconds_total{mode=\"idle\", instance=\"compute2.home\"}[$__rate_interval])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"compute2.home\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": true,
+          "intervalFactor": 1,
+          "legendFormat": "Idle",
+          "range": true,
+          "refId": "Idle",
+          "step": 240
+        }
+      ],
+      "title": "CPU Details - compute2.home",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
             "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
@@ -1188,7 +1894,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "dashed+area"
+              "mode": "dashed"
             }
           },
           "decimals": 2,
@@ -1213,8 +1919,7 @@
               }
             ]
           },
-          "unit": "percent",
-          "unitScale": true
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -1222,10 +1927,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 14
+        "y": 25
       },
       "id": 12,
-      "links": [],
       "options": {
         "legend": {
           "calcs": [],
@@ -1308,6 +2012,32 @@
           "legendFormat": "Master",
           "range": true,
           "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "100*(1 - node_filesystem_avail_bytes{instance=\"dmz1.home\",mountpoint=\"/\"} / node_filesystem_size_bytes{instance=\"dmz1.home\",mountpoint=\"/\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Dmz1",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "100*(1 - node_filesystem_avail_bytes{instance=\"dmz2.home\",mountpoint=\"/\"} / node_filesystem_size_bytes{instance=\"dmz2.home\",mountpoint=\"/\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Dmz2",
+          "range": true,
+          "refId": "E"
         }
       ],
       "title": "Storage Usage",
@@ -1331,7 +2061,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 20,
+            "fillOpacity": 75,
             "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
@@ -1373,8 +2103,7 @@
               }
             ]
           },
-          "unit": "percentunit",
-          "unitScale": true
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -1382,7 +2111,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 14
+        "y": 25
       },
       "id": 13,
       "options": {
@@ -1406,7 +2135,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "irate(node_disk_io_time_seconds_total{instance=\"storage.home\", device=\"dm-3\"}[$__rate_interval])",
+          "expr": "rate(node_disk_io_time_seconds_total{instance=\"storage.home\", device=\"dm-3\"}[$__rate_interval])",
           "hide": false,
           "legendFormat": "NAS SATA volume",
           "range": true,
@@ -1418,7 +2147,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "irate(node_disk_io_time_seconds_total{instance=\"storage.home\", device=\"dm-1\"}[$__rate_interval])",
+          "expr": "rate(node_disk_io_time_seconds_total{instance=\"storage.home\", device=\"dm-1\"}[$__rate_interval])",
           "hide": false,
           "legendFormat": "NAS NVMe volume",
           "range": true,
@@ -1430,7 +2159,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "irate(node_disk_io_time_seconds_total{instance=\"compute1.home\",device=\"sda\"}[$__rate_interval])",
+          "expr": "rate(node_disk_io_time_seconds_total{instance=\"compute1.home\",device=\"sda\"}[$__rate_interval])",
           "hide": false,
           "legendFormat": "Compute1",
           "range": true,
@@ -1442,11 +2171,35 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "irate(node_disk_io_time_seconds_total{instance=\"compute2.home\",device=\"sda\"}[$__rate_interval])",
+          "expr": "rate(node_disk_io_time_seconds_total{instance=\"compute2.home\",device=\"sda\"}[$__rate_interval])",
           "hide": false,
           "legendFormat": "Compute2",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_disk_io_time_seconds_total{instance=\"dmz1.home\",device=\"sda\"}[$__rate_interval])",
+          "hide": false,
+          "legendFormat": "Dmz1",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_disk_io_time_seconds_total{instance=\"dmz2.home\",device=\"sda\"}[$__rate_interval])",
+          "hide": false,
+          "legendFormat": "Dmz2",
+          "range": true,
+          "refId": "D"
         }
       ],
       "title": "Disk Utilization",
@@ -1458,7 +2211,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 33
       },
       "id": 4,
       "panels": [],
@@ -1495,8 +2248,7 @@
                 "value": 80
               }
             ]
-          },
-          "unitScale": true
+          }
         },
         "overrides": [
           {
@@ -1590,10 +2342,10 @@
         ]
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 34
       },
       "id": 11,
       "options": {
@@ -1606,9 +2358,15 @@
           ],
           "show": false
         },
-        "showHeader": true
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Client"
+          }
+        ]
       },
-      "pluginVersion": "10.3.1",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -1783,7 +2541,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1791,8 +2550,7 @@
               }
             ]
           },
-          "unit": "percent",
-          "unitScale": true
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -1800,7 +2558,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 42
       },
       "id": 5,
       "options": {
@@ -1813,7 +2571,7 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "sortBy": "Max",
+          "sortBy": "Last",
           "sortDesc": true
         },
         "tooltip": {
@@ -1838,7 +2596,6 @@
         }
       ],
       "title": "CPU %",
-      "transformations": [],
       "type": "timeseries"
     },
     {
@@ -1890,7 +2647,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1898,8 +2656,7 @@
               }
             ]
           },
-          "unit": "percent",
-          "unitScale": true
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -1907,7 +2664,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 41
+        "y": 54
       },
       "id": 6,
       "options": {
@@ -1953,7 +2710,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 53
+        "y": 66
       },
       "id": 14,
       "panels": [],
@@ -1986,8 +2743,7 @@
             "scaleDistribution": {
               "type": "linear"
             }
-          },
-          "unitScale": true
+          }
         },
         "overrides": []
       },
@@ -1995,7 +2751,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 54
+        "y": 67
       },
       "heatmap": {},
       "hideZeroBuckets": true,
@@ -2043,7 +2799,7 @@
           "unit": "dtdurationms"
         }
       },
-      "pluginVersion": "10.3.1",
+      "pluginVersion": "10.4.0",
       "reverseYBuckets": false,
       "targets": [
         {
@@ -2127,7 +2883,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2135,8 +2892,7 @@
               }
             ]
           },
-          "unit": "binBps",
-          "unitScale": true
+          "unit": "binBps"
         },
         "overrides": []
       },
@@ -2144,7 +2900,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 64
+        "y": 77
       },
       "id": 15,
       "interval": "1m",
@@ -2248,7 +3004,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2256,8 +3013,7 @@
               }
             ]
           },
-          "unit": "binBps",
-          "unitScale": true
+          "unit": "binBps"
         },
         "overrides": []
       },
@@ -2265,7 +3021,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 78
+        "y": 91
       },
       "id": 16,
       "interval": "1m",
@@ -2335,8 +3091,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "1. Homelab",
+  "title": "1. Overview",
   "uid": "cacaa9a6-7789-48b4-8ff6-aa27f03895c8",
-  "version": 57,
+  "version": 73,
   "weekStart": ""
 }
