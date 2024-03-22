@@ -6,7 +6,7 @@ job "cloudflared" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "dmz"
+      value     = "compute"
     }
 
     network {
