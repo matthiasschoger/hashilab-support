@@ -22,10 +22,6 @@ job "log-collection" {
             config {
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
             }
-            upstreams {
-              destination_name = "loki"
-              local_bind_port  = 3100
-            }
           }
         }
 
@@ -71,7 +67,7 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://localhost:3100/loki/api/v1/push
+  - url: http://lab.home:3100/loki/api/v1/push
 
 scrape_configs:
 - job_name: systemd-journal
@@ -118,10 +114,6 @@ EOH
           proxy {
             config {
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
-            }
-            upstreams {
-              destination_name = "loki"
-              local_bind_port  = 3100
             }
           }
         }
@@ -188,7 +180,7 @@ sinks:
 sinks:
   loki:
     type: "loki"
-    endpoint: "http://localhost:3100"
+    endpoint: "http://lab.home:3100"
     inputs: 
       - "docker_logs"
     compression: "snappy"
