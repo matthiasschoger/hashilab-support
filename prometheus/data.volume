@@ -11,9 +11,9 @@ capability {
 
 context {
   server = "storage.home"
-  share = "/volume2/homelab"
+  share = "/volume1/homelab-hdd"
   subDir = "prometheus"
-  mountPermissions = "0"  
+  mountPermissions = "755"  
 }
 
 mount_options {

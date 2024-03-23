@@ -63,6 +63,8 @@ job "prometheus" {
 
       driver = "docker"
 
+      user = "1026:100" # matthias:users
+
       config {
         image = "prom/prometheus:latest"
 
