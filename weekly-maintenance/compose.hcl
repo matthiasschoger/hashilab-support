@@ -22,6 +22,8 @@ job "weekly-maintenance" {
 echo "cleaning up docker resources"
 docker system prune --all --force
 echo "finished cleaning up docker resources"
+apt autoremove --purge -y
+echo "finished cleaning up outdated apt packages"
 EOF
         ]
       }
