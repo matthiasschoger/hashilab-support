@@ -39,14 +39,6 @@ job "prometheus" {
             config {
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
             }
-            upstreams {
-              destination_name = "snmp-exporter"
-              local_bind_port  = 9116
-            }
-            upstreams {
-              destination_name = "unifi-exporter"
-              local_bind_port  = 9130
-            }
           }
         }
 
@@ -91,56 +83,6 @@ job "prometheus" {
       }    
     }
 
-    volume "prometheus" {
-      type            = "csi"
-      source          = "prometheus"
-      access_mode     = "single-node-writer"
-      attachment_mode = "file-system"
-    }
-  }
-
-  # SNMP exporter for Synology metrics
-  group "snmp" {
-
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
-    network {
-      mode = "bridge"
-
-      port "envoy_metrics" { to = 9102 }
-    }
-
-    service {
-      name = "snmp-exporter"
-      
-      port = 9116
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
-      }
-
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              protocol = "http"
-              envoy_prometheus_bind_addr = "0.0.0.0:9102"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 96
-          }
-        }
-      }
-    }
-
     # snmp exporter for Prometheus, more like a proxy to query other machines via SNMP
     task "snmp-exporter" {
       driver = "docker"
@@ -165,49 +107,6 @@ job "prometheus" {
       resources {
         cpu    = 50
         memory = 64
-      }
-    }
-  }
-
-  # Unpoller to scrape metrics from the UDM via web API
-  group "unifi" {
-
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
-    network {
-      mode = "bridge"
-
-      port "envoy_metrics" { to = 9102 }
-    }
-
-    service {
-      name = "unifi-exporter"
-      
-      port = 9130
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
-      }
-
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              protocol = "http"
-              envoy_prometheus_bind_addr = "0.0.0.0:9102"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 100
-          }
-        }
       }
     }
 
@@ -236,6 +135,13 @@ job "prometheus" {
         cpu    = 50
         memory = 100
       }
+    }
+  
+    volume "prometheus" {
+      type            = "csi"
+      source          = "prometheus"
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
     }
   }
 }
