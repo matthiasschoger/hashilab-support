@@ -51,8 +51,8 @@ job "portainer" {
 
         sidecar_task {
           resources {
-            cpu    = 100
-            memory = 64
+            cpu    = 50
+            memory = 48
           }
         }
       }
@@ -79,7 +79,7 @@ job "portainer" {
       }
 
       resources {
-        memory = 100
+        memory = 48
         cpu    = 50
       }
 

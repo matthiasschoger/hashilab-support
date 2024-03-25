@@ -40,7 +40,7 @@ job "node-exporter" {
         sidecar_task {
           resources {
             cpu    = 50
-            memory = 64
+            memory = 32
           }
         }
       }
@@ -64,8 +64,8 @@ job "node-exporter" {
       }
 
       resources {
-        memory = 100
-        cpu    = 100
+        memory = 32
+        cpu    = 50
       }
     }
   }
