@@ -29,7 +29,7 @@ job "nightly-backups" {
 echo "backing up Unifi Network MongoDB"
 nomad action -job=unifi-network -group=mongodb -task=mongodb backup-mongodb
 echo "backing up Bookstack MariaDB"
-nomad action -job=bookstack -group=mariadb -task=mariadb backup-mariadb
+nomad action -job=bookstack -group=bookstack -task=mariadb backup-mariadb
 echo "finished running nightly backups"
 EOF
         ]
