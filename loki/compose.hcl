@@ -67,6 +67,8 @@ job "loki" {
     task "server" {
       driver = "docker"
 
+      user = "1026:100" # matthias:users
+
       config {
         image = "grafana/loki:latest"
         args = [
