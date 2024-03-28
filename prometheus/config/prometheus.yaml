@@ -20,7 +20,7 @@ rule_files:
 # scrape configurations
 scrape_configs:
   - job_name: node-exporter-host
-    scrape_interval: 15s
+#    scrape_interval: 15s
     # metrics_path: /metrics # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.
     static_configs:
@@ -33,7 +33,7 @@ scrape_configs:
       target_label: instance
 
   - job_name: node-exporter-consul
-    scrape_interval: 15s
+#    scrape_interval: 15s
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['node-exporter']
@@ -67,7 +67,7 @@ scrape_configs:
       format: ['prometheus']
 
   - job_name: envoy-consul
-    scrape_interval: 15s
+#    scrape_interval: 15s
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
     relabel_configs:
@@ -172,7 +172,7 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - source_labels: [__param_target]
-#       wtf? This configures the SNMP Exporter endpoint      
+        # wtf? This configures the SNMP Exporter endpoint      
         regex: (.*)
         replacement: localhost:9116
         target_label: __address__
