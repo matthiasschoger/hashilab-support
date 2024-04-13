@@ -70,7 +70,8 @@ job "loki" {
       user = "1026:100" # matthias:users
 
       config {
-        image = "grafana/loki:latest"
+#        image = "grafana/loki:latest" # FIXME: change back to latest when the errors are fixed
+        image = "grafana/loki:2.9.6"
         args = [
           "-config.file=/local/config.yml",
           "-config.expand-env=true",
