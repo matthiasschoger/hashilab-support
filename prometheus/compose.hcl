@@ -73,8 +73,8 @@ job "prometheus" {
       }
 
       resources {
-        cpu    = 500
-        memory = 1000
+        cpu    = 600
+        memory = 1536
       }
 
       volume_mount {
