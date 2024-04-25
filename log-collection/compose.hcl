@@ -52,7 +52,7 @@ job "log-collection" {
       }
 
       resources {
-        memory = 150
+        memory = 256
         cpu    = 100
       }
 
@@ -142,7 +142,7 @@ EOH
       }
 
       resources {
-        memory = 100
+        memory = 128
         cpu    = 100
       }
 

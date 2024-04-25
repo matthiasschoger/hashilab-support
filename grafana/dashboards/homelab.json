@@ -40,45 +40,16 @@
         "type": "prometheus",
         "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
       },
-      "description": "Spikes on this graph that are missing from the LAN graph indicate gateway-originated traffic, like a scheduled speed test. Rx is on the negative axis.",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
           "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "bytes / second",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
             },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "filterable": false,
+            "inspect": false
           },
-          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -86,45 +57,171 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
-          "unit": "Bps"
+          "unit": "none"
         },
         "overrides": [
           {
             "matcher": {
-              "id": "byRegexp",
-              "options": "/Tx$/"
+              "id": "byName",
+              "options": "Value"
             },
             "properties": [
               {
-                "id": "custom.transform",
-                "value": "negative-Y"
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "1": {
+                        "index": 0,
+                        "text": "Raid Normal"
+                      },
+                      "2": {
+                        "index": 1,
+                        "text": "Raid Repairing"
+                      },
+                      "3": {
+                        "index": 2,
+                        "text": "Raid Migrating"
+                      },
+                      "4": {
+                        "index": 3,
+                        "text": "Raid Expanding"
+                      },
+                      "5": {
+                        "index": 4,
+                        "text": "Raid Deleting"
+                      },
+                      "6": {
+                        "index": 5,
+                        "text": "Raid Creating"
+                      },
+                      "7": {
+                        "index": 6,
+                        "text": "Raid Syncing"
+                      },
+                      "8": {
+                        "index": 7,
+                        "text": "Raid Parity Checking"
+                      },
+                      "9": {
+                        "index": 8,
+                        "text": "Raid Assembling"
+                      },
+                      "10": {
+                        "index": 9,
+                        "text": "Raid Canceling"
+                      },
+                      "11": {
+                        "index": 10,
+                        "text": "Raid Degraded"
+                      },
+                      "12": {
+                        "index": 11,
+                        "text": "Raid Crashed"
+                      },
+                      "13": {
+                        "index": 12,
+                        "text": "Raid Data Scrubbing"
+                      },
+                      "14": {
+                        "index": 13,
+                        "text": "Raid Deploying"
+                      },
+                      "15": {
+                        "index": 14,
+                        "text": "Raid UnDeploying"
+                      },
+                      "16": {
+                        "index": 15,
+                        "text": "Raid Mount Cache"
+                      },
+                      "17": {
+                        "index": 16,
+                        "text": "Raid Unmount Cache"
+                      },
+                      "18": {
+                        "index": 17,
+                        "text": "Raid Expanding Unfinished SHR"
+                      },
+                      "19": {
+                        "index": 18,
+                        "text": "Raid Convert SHR To Pool"
+                      },
+                      "20": {
+                        "index": 19,
+                        "text": "Raid Unknown Status"
+                      },
+                      "21": {
+                        "index": 20,
+                        "text": "Raid Migrate SHR1 To SHR2"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "semi-dark-green",
+                      "value": null
+                    },
+                    {
+                      "color": "semi-dark-yellow",
+                      "value": 2
+                    },
+                    {
+                      "color": "semi-dark-red",
+                      "value": 11
+                    },
+                    {
+                      "color": "semi-dark-yellow",
+                      "value": 13
+                    },
+                    {
+                      "color": "semi-dark-red",
+                      "value": 21
+                    }
+                  ]
+                }
               }
             ]
           },
           {
             "matcher": {
-              "id": "byValue",
-              "options": {
-                "op": "gte",
-                "reducer": "allIsNull",
-                "value": 0
-              }
+              "id": "byName",
+              "options": "Name"
             },
             "properties": [
               {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": true,
-                  "tooltip": true,
-                  "viz": false
-                }
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 99
               }
             ]
           }
@@ -132,27 +229,164 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 12,
+        "w": 6,
         "x": 0,
         "y": 1
       },
-      "id": 20,
+      "id": 9,
       "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
           ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
+          "show": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Name"
+          }
+        ]
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "raidStatus{job=\"snmp\", raidName=~\"Volume.*\"}",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "__auto",
+          "refId": "Status"
+        }
+      ],
+      "title": "Synology RAID Status",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "raidName",
+                "Value"
+              ]
+            }
+          }
+        },
+        {
+          "id": "seriesToColumns",
+          "options": {
+            "byField": "raidName",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Value": false,
+              "diskID": false,
+              "raidIndex": false,
+              "raidName": false,
+              "raidName 2": true
+            },
+            "indexByName": {
+              "Value #A": 4,
+              "Value #C": 3,
+              "diskID": 0,
+              "diskModel": 2,
+              "diskType": 1
+            },
+            "renameByName": {
+              "Value": "Status",
+              "Value #A": "Temperature",
+              "Value #C": "Status",
+              "Value #Status": "Status",
+              "diskID": "Disk",
+              "diskModel": "Model",
+              "diskType": "Type",
+              "raidName": "Name"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 3,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgba(245, 54, 54, 0.9)",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 6,
+        "y": 1
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -160,54 +394,87 @@
             "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
           },
           "editorMode": "code",
-          "expr": "rate(unpoller_device_wan_receive_bytes_total{}[$__rate_interval])",
-          "interval": "",
-          "legendFormat": "Bytes Rx",
+          "expr": "min(consul_autopilot_failure_tolerance{})\n",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "",
           "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-          },
-          "editorMode": "code",
-          "expr": "rate(unpoller_device_wan_transmit_bytes_total{}[$__rate_interval])",
-          "interval": "",
-          "legendFormat": "Bytes Tx",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-          },
-          "editorMode": "code",
-          "expr": "unpoller_device_wan_transmit_rate_bytes{}",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "Bytes Tx",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-          },
-          "editorMode": "code",
-          "expr": "unpoller_device_wan_receive_rate_bytes{}",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "Bytes Rx",
-          "range": true,
-          "refId": "D"
+          "refId": "A",
+          "step": 60
         }
       ],
-      "title": "WAN Throughput",
-      "transparent": true,
-      "type": "timeseries"
+      "title": "Consul tolerance",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 9,
+        "y": 1
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "nomad_nomad_autopilot_failure_tolerance{job=\"nomad\"}",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "fault tolerance",
+          "refId": "A"
+        }
+      ],
+      "title": "Nomad tolerance",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -449,7 +716,7 @@
           }
         ]
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -571,16 +838,45 @@
         "type": "prometheus",
         "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
       },
+      "description": "Spikes on this graph that are missing from the LAN graph indicate gateway-originated traffic, like a scheduled speed test. Rx is on the negative axis.",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": "left",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "filterable": false,
-            "inspect": false
+          "color": {
+            "mode": "palette-classic"
           },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "bytes / second",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -588,171 +884,45 @@
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
-          "unit": "none"
+          "unit": "Bps"
         },
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Value"
+              "id": "byRegexp",
+              "options": "/Tx$/"
             },
             "properties": [
               {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "1": {
-                        "index": 0,
-                        "text": "Raid Normal"
-                      },
-                      "2": {
-                        "index": 1,
-                        "text": "Raid Repairing"
-                      },
-                      "3": {
-                        "index": 2,
-                        "text": "Raid Migrating"
-                      },
-                      "4": {
-                        "index": 3,
-                        "text": "Raid Expanding"
-                      },
-                      "5": {
-                        "index": 4,
-                        "text": "Raid Deleting"
-                      },
-                      "6": {
-                        "index": 5,
-                        "text": "Raid Creating"
-                      },
-                      "7": {
-                        "index": 6,
-                        "text": "Raid Syncing"
-                      },
-                      "8": {
-                        "index": 7,
-                        "text": "Raid Parity Checking"
-                      },
-                      "9": {
-                        "index": 8,
-                        "text": "Raid Assembling"
-                      },
-                      "10": {
-                        "index": 9,
-                        "text": "Raid Canceling"
-                      },
-                      "11": {
-                        "index": 10,
-                        "text": "Raid Degraded"
-                      },
-                      "12": {
-                        "index": 11,
-                        "text": "Raid Crashed"
-                      },
-                      "13": {
-                        "index": 12,
-                        "text": "Raid Data Scrubbing"
-                      },
-                      "14": {
-                        "index": 13,
-                        "text": "Raid Deploying"
-                      },
-                      "15": {
-                        "index": 14,
-                        "text": "Raid UnDeploying"
-                      },
-                      "16": {
-                        "index": 15,
-                        "text": "Raid Mount Cache"
-                      },
-                      "17": {
-                        "index": 16,
-                        "text": "Raid Unmount Cache"
-                      },
-                      "18": {
-                        "index": 17,
-                        "text": "Raid Expanding Unfinished SHR"
-                      },
-                      "19": {
-                        "index": 18,
-                        "text": "Raid Convert SHR To Pool"
-                      },
-                      "20": {
-                        "index": 19,
-                        "text": "Raid Unknown Status"
-                      },
-                      "21": {
-                        "index": 20,
-                        "text": "Raid Migrate SHR1 To SHR2"
-                      }
-                    },
-                    "type": "value"
-                  }
-                ]
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "type": "color-text"
-                }
-              },
-              {
-                "id": "color",
-                "value": {
-                  "mode": "thresholds"
-                }
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "semi-dark-green",
-                      "value": null
-                    },
-                    {
-                      "color": "semi-dark-yellow",
-                      "value": 2
-                    },
-                    {
-                      "color": "semi-dark-red",
-                      "value": 11
-                    },
-                    {
-                      "color": "semi-dark-yellow",
-                      "value": 13
-                    },
-                    {
-                      "color": "semi-dark-red",
-                      "value": 21
-                    }
-                  ]
-                }
+                "id": "custom.transform",
+                "value": "negative-Y"
               }
             ]
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Name"
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
             },
             "properties": [
               {
-                "id": "custom.align",
-                "value": "left"
-              },
-              {
-                "id": "custom.width",
-                "value": 99
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": false
+                }
               }
             ]
           }
@@ -760,164 +930,27 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 6,
+        "w": 12,
         "x": 0,
         "y": 6
       },
-      "id": 9,
+      "id": 20,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "enablePagination": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": false,
-            "displayName": "Name"
-          }
-        ]
-      },
-      "pluginVersion": "10.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "raidStatus{job=\"snmp\", raidName=~\"Volume.*\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "__auto",
-          "refId": "Status"
-        }
-      ],
-      "title": "Synology RAID Status",
-      "transformations": [
-        {
-          "id": "filterFieldsByName",
-          "options": {
-            "include": {
-              "names": [
-                "raidName",
-                "Value"
-              ]
-            }
-          }
-        },
-        {
-          "id": "seriesToColumns",
-          "options": {
-            "byField": "raidName",
-            "mode": "outer"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Value": false,
-              "diskID": false,
-              "raidIndex": false,
-              "raidName": false,
-              "raidName 2": true
-            },
-            "indexByName": {
-              "Value #A": 4,
-              "Value #C": 3,
-              "diskID": 0,
-              "diskModel": 2,
-              "diskType": 1
-            },
-            "renameByName": {
-              "Value": "Status",
-              "Value #A": "Temperature",
-              "Value #C": "Status",
-              "Value #Status": "Status",
-              "diskID": "Disk",
-              "diskModel": "Model",
-              "diskType": "Type",
-              "raidName": "Name"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "max": 3,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "rgba(245, 54, 54, 0.9)",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 6,
-        "y": 6
-      },
-      "id": 8,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
+        "legend": {
           "calcs": [
-            "lastNotNull"
+            "lastNotNull",
+            "max"
           ],
-          "fields": "",
-          "values": false
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -925,87 +958,53 @@
             "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
           },
           "editorMode": "code",
-          "expr": "min(consul_autopilot_failure_tolerance{})\n",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "",
+          "expr": "rate(unpoller_device_wan_receive_bytes_total{}[$__rate_interval])",
+          "interval": "",
+          "legendFormat": "Bytes Rx",
           "range": true,
-          "refId": "A",
-          "step": 60
-        }
-      ],
-      "title": "Consul tolerance",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
+          "refId": "A"
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 9,
-        "y": 6
-      },
-      "id": 7,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "value",
-        "wideLayout": true
-      },
-      "pluginVersion": "10.4.0",
-      "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
           },
           "editorMode": "code",
-          "exemplar": false,
-          "expr": "nomad_nomad_autopilot_failure_tolerance{job=\"nomad\"}",
-          "instant": true,
+          "expr": "rate(unpoller_device_wan_transmit_bytes_total{}[$__rate_interval])",
           "interval": "",
-          "legendFormat": "fault tolerance",
-          "refId": "A"
+          "legendFormat": "Bytes Tx",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "unpoller_device_wan_transmit_rate_bytes{}",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "Bytes Tx",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "dc5d4f1c-2b4a-4b29-aeab-846174dc5891"
+          },
+          "editorMode": "code",
+          "expr": "unpoller_device_wan_receive_rate_bytes{}",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "Bytes Rx",
+          "range": true,
+          "refId": "D"
         }
       ],
-      "title": "Nomad tolerance",
-      "type": "stat"
+      "title": "WAN Throughput",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -1954,7 +1953,7 @@
           "format": "time_series",
           "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "NAS HDD Volume",
+          "legendFormat": "NAS HDD",
           "range": true,
           "refId": "Used 1",
           "step": 240
@@ -1969,7 +1968,7 @@
           "format": "time_series",
           "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "NAS NVMe Volume",
+          "legendFormat": "NAS NVMe",
           "range": true,
           "refId": "Used 2",
           "step": 240
@@ -2137,7 +2136,7 @@
           "editorMode": "code",
           "expr": "rate(node_disk_io_time_seconds_total{instance=\"storage.home\", device=\"dm-3\"}[$__rate_interval])",
           "hide": false,
-          "legendFormat": "NAS SATA volume",
+          "legendFormat": "NAS SATA",
           "range": true,
           "refId": "util sata"
         },
@@ -2149,7 +2148,7 @@
           "editorMode": "code",
           "expr": "rate(node_disk_io_time_seconds_total{instance=\"storage.home\", device=\"dm-1\"}[$__rate_interval])",
           "hide": false,
-          "legendFormat": "NAS NVMe volume",
+          "legendFormat": "NAS NVMe",
           "range": true,
           "refId": "util nvme"
         },
@@ -2176,6 +2175,18 @@
           "legendFormat": "Compute2",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_disk_io_time_seconds_total{instance=\"master.home\",device=\"sda\"}[$__rate_interval])",
+          "hide": false,
+          "legendFormat": "Master",
+          "range": true,
+          "refId": "E"
         },
         {
           "datasource": {
@@ -2366,7 +2377,7 @@
           }
         ]
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -2564,7 +2575,7 @@
       "options": {
         "legend": {
           "calcs": [
-            "last",
+            "lastNotNull",
             "mean",
             "max"
           ],
@@ -2670,7 +2681,7 @@
       "options": {
         "legend": {
           "calcs": [
-            "last",
+            "lastNotNull",
             "mean",
             "max"
           ],
@@ -2799,7 +2810,7 @@
           "unit": "dtdurationms"
         }
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "reverseYBuckets": false,
       "targets": [
         {
@@ -2907,14 +2918,14 @@
       "options": {
         "legend": {
           "calcs": [
-            "last",
+            "lastNotNull",
             "mean",
             "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "sortBy": "Last",
+          "sortBy": "Last *",
           "sortDesc": true
         },
         "tooltip": {
@@ -3028,14 +3039,14 @@
       "options": {
         "legend": {
           "calcs": [
-            "last",
+            "lastNotNull",
             "mean",
             "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "sortBy": "Last",
+          "sortBy": "Last *",
           "sortDesc": true
         },
         "tooltip": {
@@ -3093,6 +3104,6 @@
   "timezone": "",
   "title": "1. Overview",
   "uid": "cacaa9a6-7789-48b4-8ff6-aa27f03895c8",
-  "version": 73,
+  "version": 85,
   "weekStart": ""
 }
