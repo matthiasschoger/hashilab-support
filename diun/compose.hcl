@@ -37,7 +37,7 @@ job "diun" {
       }
 
       resources {
-        memory = 32
+        memory = 64
         cpu    = 50
       }
 
