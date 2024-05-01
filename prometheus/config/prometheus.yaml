@@ -116,7 +116,7 @@ scrape_configs:
   - job_name: 'traefik'
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
-      services: ['traefik-api']
+      services: ['traefik-home-api','traefik-dmz-api']
     relabel_configs:
     - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
       regex: ([^:]+)(?::\d+)?;(\d+)
