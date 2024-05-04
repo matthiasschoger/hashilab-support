@@ -20,20 +20,18 @@ rule_files:
 # scrape configurations
 scrape_configs:
   - job_name: node-exporter-host
-#    scrape_interval: 15s
     # metrics_path: /metrics # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.
     static_configs:
       - targets:
           - 'storage.home:9100'
     relabel_configs:
-    - source_labels: [__address__]
+    - source_labels: [__address__] # strip port from instance name
       regex: ([^:]+):.*
       replacement: ${1}
       target_label: instance
 
   - job_name: node-exporter-consul
-#    scrape_interval: 15s
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['node-exporter']
@@ -42,7 +40,7 @@ scrape_configs:
       regex: ([^:]+)(?::\d+)?;(\d+)
       replacement: ${1}:${2}
       target_label: __address__
-    - source_labels: [__meta_consul_node]
+    - source_labels: [__meta_consul_node] # add ".home" to Consul node name
       regex: (.*)
       replacement: ${1}.home
       target_label: instance
@@ -67,7 +65,6 @@ scrape_configs:
       format: ['prometheus']
 
   - job_name: envoy-consul
-#    scrape_interval: 15s
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
     relabel_configs:
@@ -98,10 +95,16 @@ scrape_configs:
       regex: "(.+)"
       replacement: ${1}
       target_label: "service_name"
-  - job_name: envoy_prometheus # for the local Prometheus proxy, prometheus cannot connect to it's own proxy
+
+  - job_name: envoy-prometheus # for the local Prometheus proxy, prometheus cannot connect to it's own proxy
     static_configs: 
       - targets:
           - 'localhost:9102'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
 
   - job_name: 'consul'
     metrics_path: /v1/agent/metrics
@@ -112,6 +115,11 @@ scrape_configs:
           - 'compute1.home:8500'
           - 'compute2.home:8500'
           - 'master.home:8500'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
 
   - job_name: 'traefik'
     consul_sd_configs:
@@ -146,19 +154,33 @@ scrape_configs:
       - targets:
           - 'compute1.home:9153'
           - 'compute2.home:9153'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
 
   - job_name: prometheus
     static_configs:
       - targets:
           - 'localhost:9090'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
 
   - job_name: cadvisor
     static_configs:
     - targets:
       - storage.home:9117
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
 
-# https://mariushosting.com/monitor-your-synology-with-grafana-and-prometheus-dashboard/
-  - job_name: snmp
+  - job_name: snmp # https://mariushosting.com/monitor-your-synology-with-grafana-and-prometheus-dashboard/
     static_configs:
       - targets: 
           - 'storage.home'
@@ -171,13 +193,18 @@ scrape_configs:
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
-      - source_labels: [__param_target]
-        # wtf? This configures the SNMP Exporter endpoint      
+      - source_labels: [__param_target] # wtf? This configures the SNMP Exporter endpoint      
         regex: (.*)
         replacement: localhost:9116
         target_label: __address__
 
   - job_name: 'unifipoller'
     static_configs:
-    - targets: ['localhost:9130']
+    - targets: 
+      - 'localhost:9130'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
 
