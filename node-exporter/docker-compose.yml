@@ -42,5 +42,5 @@ services:
 
     command:
       - "--docker_only"
-      - "--disable_metrics=percpu,cpu_topology,sched,accelerator,hugetlb,advtcp,disk,diskIO"
+      - "--disable_metrics=percpu,cpu_topology,sched,hugetlb,advtcp,disk,diskIO"
       - "--housekeeping_interval=10s"
