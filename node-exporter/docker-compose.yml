@@ -23,7 +23,7 @@ services:
       - "--collector.filesystem.mount-points-exclude"
       - "^/(rootfs/)?(dev|etc|host|proc|run|sys|volume1)($$|/)"
 
-
+  # test
   cadvisor:
     privileged: true
     image: gcr.io/cadvisor/cadvisor:latest
