@@ -28,7 +28,7 @@ job "log-collection" {
         sidecar_task {
           resources {
             cpu    = 50
-            memory = 64
+            memory = 48
           }
         }
       }
@@ -52,8 +52,8 @@ job "log-collection" {
       }
 
       resources {
-        memory = 256
-        cpu    = 100
+        memory = 96
+        cpu    = 50
       }
 
       template {
@@ -121,7 +121,7 @@ EOH
         sidecar_task {
           resources {
             cpu    = 50
-            memory = 64
+            memory = 48
           }
         }
       }
@@ -142,8 +142,8 @@ EOH
       }
 
       resources {
-        memory = 128
-        cpu    = 100
+        memory = 64
+        cpu    = 50
       }
 
       template {
