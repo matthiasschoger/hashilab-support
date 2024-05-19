@@ -6,7 +6,7 @@ job "cloudflared" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "compute"
+      value     = "dmz"
     }
 
     network {
@@ -30,7 +30,7 @@ job "cloudflared" {
                         envoy_prometheus_bind_addr = "0.0.0.0:9102"
                     }
                     upstreams {
-                        destination_name = "traefik-cloudflare"
+                        destination_name = "traefik-dmz-http"
                         local_bind_port  = 80
                     }
                 }
