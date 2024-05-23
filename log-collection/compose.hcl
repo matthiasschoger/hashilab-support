@@ -90,6 +90,8 @@ EOH
     }
   }
 
+/*
+  # Vector group
   group "vector" {
 
     network {
@@ -105,6 +107,16 @@ EOH
 
     service {
       name = "vector"
+
+      port = 8686
+
+      check {
+        type     = "http"
+        path     = "/health"
+        interval = "30s"
+        timeout  = "5s"
+        expose   = true # required for Connect
+      }
 
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
@@ -132,17 +144,22 @@ EOH
 
       config {
         image = "timberio/vector:latest-debian"
+
+        volumes = [
+          "/etc/machine-id:/etc/machine-id:ro" # required for Vector
+        ]
       }
 
       env {
-        TZ = "Europe/Berlin"
+        TZ     = "Europe/Berlin"
+        LC_ALL = "C.UTF-8" # required for UTF-8 support
 
         VECTOR_CONFIG = "/local/vector.yaml"
         VECTOR_REQUIRE_HEALTHY = "true"
       }
 
       resources {
-        memory = 64
+        memory = 512
         cpu    = 50
       }
 
@@ -156,7 +173,7 @@ EOH
         data            = <<EOH
 data_dir: "alloc/data/vector/"
 api:
-  enabled: false
+  enabled: true
 sources:
   docker_logs:
     type: "docker_logs"
@@ -166,8 +183,7 @@ sources:
 #    inputs: 
 #      - "docker_logs"
 #    type: "remap"
-#    source: |
-#      .matthias, err = parse_json(replace(.message, r'([^\x00-\x7F])', "\\\\$$1") ?? .message)
+#    source: ".message = parse_json!(.message)"
 
 sinks:
   out:
@@ -177,7 +193,6 @@ sinks:
     target: "stdout"
     encoding:
       codec: "json"
-sinks:
   loki:
     type: "loki"
     endpoint: "http://lab.home:3100"
@@ -215,4 +230,5 @@ EOH
       read_only = true
     }
   }
+*/
 }
