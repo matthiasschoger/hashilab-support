@@ -26,6 +26,8 @@ job "nightly-backups" {
         # command line arguments which call Nomad to execute the backup Action
         # add additional backup Actions as desired
         args    = ["-c", <<EOF
+echo "backing up Nomad variables"
+nomad operator snapshot save /backup/raft-backup.$(date +"%Y%m%d%H%M").snap
 echo "backing up Unifi Network MongoDB"
 nomad action -job=unifi-network -group=mongodb -task=mongodb backup-mongodb
 echo "backing up Bookstack MariaDB"
@@ -53,6 +55,18 @@ EOH
         memory = 100
         cpu    = 100
       }
+
+      volume_mount {
+        volume      = "nomad"
+        destination = "/backup"
+      }    
+    }
+
+    volume "nomad" {
+      type            = "csi"
+      source          = "nomad"
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
     }
   }
 }
