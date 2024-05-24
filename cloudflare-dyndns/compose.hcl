@@ -63,16 +63,20 @@ job "cloudflare-dyndns" {
         env = true
         data = <<EOH
 {{- with nomadVar "nomad/jobs/cloudflare-dyndns" }}
+# pull config
+FRITZBOX_ENDPOINT_URL = "http://fritz.box:49000"
+FRITZBOX_ENDPOINT_INTERVAL = "120s" # poll every two minutes (should not be neccessary since we're usting push)
+
+# push config
 DYNDNS_SERVER_BIND = ":80"
 DYNDNS_SERVER_USERNAME = "ddns"
 DYNDNS_SERVER_PASSWORD = "ddns"
+
 CLOUDFLARE_API_EMAIL = "{{- .email }}"
 CLOUDFLARE_API_TOKEN = "{{- .token }}"
 CLOUDFLARE_ZONES_IPV4 = "{{- .zone }}"
 CLOUDFLARE_ZONES_IPV6 = "{{- .zone }}"
-DEVICE_LOCAL_ADDRESS_IPV6 = "::1:0:0:0:2" # UXG-lite postfix
-FRITZBOX_ENDPOINT_URL = "http://fritz.box:49000"
-FRITZBOX_ENDPOINT_INTERVAL = "120s" # poll every two minutes (should not be neccessary since we're usting push)
+# DEVICE_LOCAL_ADDRESS_IPV6 = "::1:0:0:0:2" # UXG-lite postfix
 {{- end }}
 EOH
       }
