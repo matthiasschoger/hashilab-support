@@ -52,7 +52,7 @@ job "log-collection" {
       }
 
       resources {
-        memory = 96
+        memory = 128
         cpu    = 50
       }
 
@@ -146,7 +146,7 @@ EOH
         image = "timberio/vector:latest-debian"
 
         volumes = [
-          "/etc/machine-id:/etc/machine-id:ro" # required for Vector
+          "/etc/machine-id:/etc/machine-id:ro" # required for Vector?
         ]
       }
 
@@ -155,7 +155,6 @@ EOH
         LC_ALL = "C.UTF-8" # required for UTF-8 support
 
         VECTOR_CONFIG = "/local/vector.yaml"
-        VECTOR_REQUIRE_HEALTHY = "true"
       }
 
       resources {
@@ -174,17 +173,28 @@ EOH
 data_dir: "alloc/data/vector/"
 api:
   enabled: true
+healthchecks:
+  require_healthy: true
+
 sources:
   docker_logs:
     type: "docker_logs"
 
-#transforms:
-#  docker_transformed:
-#    inputs: 
-#      - "docker_logs"
-#    type: "remap"
-#    source: ".message = parse_json!(.message)"
-
+transforms:
+  throttled_docker_logs:
+    type: "throttle"
+    inputs:
+      - "docker_logs"
+    threshold: 1
+    window_secs: 10
+  translormed_logs:
+    type: "remap"
+    inputs
+      -  "logs"
+    source: '''
+            .debug = parse_key_value!(.message)
+            .job_name = split(get!(value: .label, path: ["com.hashicorp.nomad.job_name"]), "/")[0] ?? get!(value: .label, path: ["com.hashicorp.nomad.job_name"])
+    '''
 sinks:
   out:
     type: "console"
@@ -196,15 +206,18 @@ sinks:
   loki:
     type: "loki"
     endpoint: "http://lab.home:3100"
-    inputs: 
-      - "docker_logs"
-    compression: "snappy"
-    encoding:
-      codec: "json"
     healthcheck:
       enabled: true
-    # remove fields that have been converted to labels to avoid having the field twice
-    remove_label_fields: true
+    inputs: 
+#      - "throttled_docker_logs"
+      - "translormed_logs"
+    encoding:
+      codec: "json"
+    buffer
+      type: "memory"
+#    batch:
+#      max_bytes: 1000000
+#      max_events: 1
     labels:
       app: "containers"
       # See https://vector.dev/docs/reference/vrl/expressions/#path-example-nested-path
@@ -212,6 +225,7 @@ sinks:
       task: "{{label.\"com.hashicorp.nomad.task_name\" }}"
       group: "{{label.\"com.hashicorp.nomad.task_group_name\" }}"
       node: "{{label.\"com.hashicorp.nomad.node_name\" }}"
+    remove_label_fields: true # remove fields that have been converted to labels to avoid having the field twice
 EOH
       }
 

@@ -24,6 +24,8 @@ docker system prune --all --force
 echo "finished cleaning up docker resources"
 apt autoremove --purge -y
 echo "finished cleaning up outdated apt packages"
+journalctl --vacuum-time=7d 2>&1
+echo "finished purging old log data from journald"
 EOF
         ]
       }

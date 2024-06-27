@@ -19,7 +19,10 @@ job "loki" {
     network {
       mode = "bridge"
 
-      port "envoy_metrics" { to = 9102 }
+      port "rsyslog" { static = 514 }
+
+      port "envoy_metrics_loki" { to = 9102 }
+      port "envoy_metrics_syslog" { to = 9103 }
     }
 
     service {
@@ -43,7 +46,7 @@ job "loki" {
       ]
 
       meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_loki}" # make envoy metrics port available in Consul
       }
       connect {
         sidecar_service {
@@ -63,15 +66,23 @@ job "loki" {
         }
       }
     }
+/*
+    service {
+      name = "rsyslog"
 
+      port = "rsyslog"
+
+      task = "rsyslog"
+    }
+*/
     task "server" {
       driver = "docker"
 
       user = "1026:100" # matthias:users
 
       config {
-#        image = "grafana/loki:latest" # FIXME: change back to latest when the errors are fixed
-        image = "grafana/loki:2.9.6"
+        image = "grafana/loki:latest"
+
         args = [
           "-config.file=/local/config.yml",
           "-config.expand-env=true",
@@ -88,7 +99,7 @@ job "loki" {
       }
 
       resources {
-        memory = 250
+        memory = 500
         cpu    = 100
       }
 
@@ -97,13 +108,99 @@ job "loki" {
         destination = "/loki"
       }    
     }
+/*
+    task "promtail" {
+      driver = "docker"
 
+      config {
+        image = "grafana/promtail:latest"
+
+        args = ["--config.file", "/local/promtail.yaml"]
+      }
+
+      env {
+        TZ = "Europe/Berlin"
+      }
+
+      template {
+        destination = "local/promtail.yaml"
+        data            = <<EOH
+server:  
+  http_listen_port: 9080  
+  grpc_listen_port: 0  
+positions:  
+  filename: /tmp/positions.yaml  
+clients:  
+  - url: http://localhost:3100/loki/api/v1/push 
+scrape_configs: 
+  - job_name: syslog 
+    syslog: 
+      listen_address: 0.0.0.0:1514 
+      labels: 
+        job: syslog 
+    relabel_configs: 
+      - source_labels: [__syslog_message_hostname] 
+        target_label: host 
+      - source_labels: [__syslog_message_hostname] 
+        target_label: hostname 
+      - source_labels: [__syslog_message_severity] 
+        target_label: level 
+      - source_labels: [__syslog_message_app_name] 
+        target_label: application 
+      - source_labels: [__syslog_message_facility] 
+        target_label: facility 
+      - source_labels: [__syslog_connection_hostname] 
+        target_label: connection_hostname
+EOH
+      }
+
+      resources {
+        memory = 96
+        cpu    = 50
+      }
+    }
+
+    task "rsyslog" {
+      driver = "docker"
+
+      config {
+        image = "linuxserver/syslog-ng:latest"
+      }
+
+      env {
+        TZ = "Europe/Berlin"
+      }
+
+      template {
+        destination = "/etc/syslog-ng/syslog-ng.conf"
+        data            = <<EOH
+source s_network {
+    default-network-drivers(
+    );
+};
+
+destination d_loki {
+    syslog("promtail" transport("tcp") port("1514"));
+};
+
+log {
+        source(s_network);
+        destination(d_loki);
+};
+EOH
+      }
+
+      resources {
+        memory = 96
+        cpu    = 50
+      }
+    }
+*/
     volume "loki" {
       type            = "csi"
       source          = "loki"
       access_mode     = "single-node-writer"
       attachment_mode = "file-system"
     }
-
   }
 }
