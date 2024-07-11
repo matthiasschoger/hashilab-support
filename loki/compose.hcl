@@ -82,6 +82,7 @@ job "loki" {
 
       config {
         image = "grafana/loki:latest"
+#        image = "grafana/loki:2.9.8"
 
         args = [
           "-config.file=/local/config.yml",

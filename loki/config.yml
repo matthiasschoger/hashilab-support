@@ -18,8 +18,6 @@ ingester:
   max_chunk_age: 1h
   # Loki will attempt to build chunks up to 1.5MB, flushing if chunk_idle_period or max_chunk_age is reached first
   chunk_target_size: 1048576
-  # Must be greater than index read cache TTL if using an index cache (Default index read cache TTL is 5m)
-  chunk_retain_period: 30s
   max_transfer_retries: 0     # Chunk transfers disabled
   wal:
     dir: {{ env "NOMAD_ALLOC_DIR" }}/data/wal
@@ -28,25 +26,25 @@ ingester:
 
 schema_config:
   configs:
-  - from: 2023-01-01
-    store: boltdb-shipper
-    object_store: filesystem
-    schema: v12
-    index:
-      prefix: index_
-      period: 24h
+    - from: 2024-07-11
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: tsdb_index_
+        period: 24h
 
 storage_config:
   filesystem:
     directory: /loki/chunks
-  boltdb_shipper:
-    active_index_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/boltdb-shipper-active
-    cache_location: {{ env "NOMAD_ALLOC_DIR" }}/data/boltdb-shipper-cache
+  tsdb_shipper:
+    active_index_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-active
+    cache_location: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-cache
     cache_ttl: 24h         # Can be increased for faster performance over longer query periods, uses more disk space
     shared_store: filesystem
 
 compactor:
-  working_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/boltdb-shipper-compactor
+  working_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-compactor
   shared_store: filesystem
 
 limits_config:
@@ -55,6 +53,11 @@ limits_config:
 
 chunk_store_config:
   max_look_back_period: 0s
+  chunk_cache_config:
+    embedded_cache:
+      enabled: true
+      max_size_mb: 1000
+      ttl: 24h
 
 table_manager:
   retention_deletes_enabled: false
