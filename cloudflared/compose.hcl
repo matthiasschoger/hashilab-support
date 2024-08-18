@@ -1,13 +1,8 @@
 job "cloudflared" {
-  datacenters = ["home"]
+  datacenters = ["dmz"]
   type        = "service"
 
   group "cloudflared" {
-
-    constraint {
-      attribute = "${node.class}"
-      value     = "dmz"
-    }
 
     network {
       mode = "bridge"

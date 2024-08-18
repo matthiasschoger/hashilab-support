@@ -1,5 +1,5 @@
 job "log-collection" {
-  datacenters = ["home"]
+  datacenters = ["home", "dmz"]
   type        = "system"
 
   group "promtail" {
