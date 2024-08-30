@@ -1,5 +1,5 @@
 job "weekly-maintenance" {
-  datacenters = ["home"]
+  datacenters = ["home","dmz"]
   type        = "sysbatch"
 
   # runs weekly maintenance jobs on all nodes, i.e. prune dangling docker containers which are no longer in use
