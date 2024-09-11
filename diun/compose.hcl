@@ -10,7 +10,6 @@ job "diun" {
     }
 
     ephemeral_disk {
-      size    = 300 # MB
       migrate = true
     }
 
@@ -31,8 +30,7 @@ job "diun" {
       }
 
       env = {
-        "TZ" = "Europe/Berlin",
-        "NOMAD_ADDR" = "http://${attr.unique.network.ip-address}:4646/",
+        "TZ" = "Europe/Berlin"
         "DIUN_DB_PATH" = "${NOMAD_ALLOC_DIR}/data/diun.db" # remove as soon as configuration via yaml is possible
       }
 
@@ -51,27 +49,42 @@ defaults:
     - new
     - update
 
+
 #db:            # configuration via yaml does not work, using env
-#  path: {{ env "NOMAD_ALLOC_DIR" }}/data/diun.db
+#  path: "{{ env "NOMAD_ALLOC_DIR" }}/data/diun.db"
+
 
 watch:
   schedule: "0 */6 * * *"
   compareDigest: true
-  firstCheckNotif: false
+  firstCheckNotif: true
   runOnStartup: true
+
 
 notif:
   teams:
 {{- with nomadVar "nomad/jobs/diun" }}
     webhookURL: {{ .webhook_url }}
 {{- end }}
+
   webhook:
     endpoint: https://node-red.lab.home/homelab/diun
     method: POST
 
+#  mail:
+#    host: smtp.lab.home
+#{{- with nomadVar "nomad/jobs/diun" }}
+#    username: {{ .email_user }}
+#    password: {{ .email_pass }}
+#{{- end }}
+#    from: "matthias@schoger.net"
+#    to: "matthias@schoger.net"
+
+
 providers:
   nomad:
     watchByDefault: true
+    address: "http://{{ env "attr.unique.network.ip-address" }}:4646/"
 
 EOH
       }
