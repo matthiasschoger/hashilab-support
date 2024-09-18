@@ -71,14 +71,15 @@ notif:
     endpoint: https://node-red.lab.home/homelab/diun
     method: POST
 
-#  mail:
-#    host: smtp.lab.home
-#{{- with nomadVar "nomad/jobs/diun" }}
-#    username: {{ .email_user }}
-#    password: {{ .email_pass }}
-#{{- end }}
-#    from: "matthias@schoger.net"
-#    to: "matthias@schoger.net"
+  mail:
+    host: smtp.lab.home
+{{- with nomadVar "nomad/jobs/diun" }}
+    username: {{ .email_user }}
+    password: {{ .email_pass }}
+    insecureSkipVerify: true
+{{- end }}
+    from: "matthias@schoger.net"
+    to: "matthias@schoger.net"
 
 
 providers:
