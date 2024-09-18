@@ -13,7 +13,6 @@ job "proton-bridge" {
       mode = "bridge"
 
       port "envoy_metrics_smtp" { to = 9102 }
-      port "envoy_metrics_imap" { to = 9103 }
     }
 
     service {
@@ -42,31 +41,7 @@ job "proton-bridge" {
       }    
     }
 
-    service {
-      name = "protonmail-imap"
-
-      port = 1143
-
-     meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_imap}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9103"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 64
-          }
-        }
-      }    
-    }
+    # no IMAP service exposed at this point
 
     task "server" {
       driver = "docker"
