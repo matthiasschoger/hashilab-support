@@ -135,6 +135,20 @@ scrape_configs:
       replacement: ${1}.home
       target_label: instance
 
+  - job_name: 'immich'
+    consul_sd_configs:
+    - server: 'consul.service.consul:8500'
+      services: ['immich-api','immich-worker']
+    relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
+    - source_labels: [__meta_consul_node]
+      regex: (.*)
+      replacement: ${1}.home
+      target_label: instance
+
   - job_name: 'cloudflared'
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
