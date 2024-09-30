@@ -20,7 +20,7 @@ job "diun" {
         image = "crazymax/diun:latest"
 
         args = ["serve", 
-                "--config", "/local/diun.yaml", 
+                "--config", "/secrets/diun.yaml", 
 #                "--log-level", "debug"
         ]
 
@@ -41,7 +41,7 @@ job "diun" {
 
       template {
         change_mode   = "restart"
-        destination = "/local/diun.yaml"
+        destination = "/secrets/diun.yaml"
         data = <<EOH
 defaults:
   watchRepo: false
@@ -80,6 +80,7 @@ notif:
 {{- end }}
     from: "matthias@schoger.net"
     to: "matthias@schoger.net"
+    templateTitle: "Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}"
 
 
 providers:
