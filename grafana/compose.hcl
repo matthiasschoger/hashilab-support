@@ -23,7 +23,7 @@ job "grafana" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.grafana.rule=Host(`grafana.lab.home`)",
+        "traefik.http.routers.grafana.rule=Host(`grafana.lab.schoger.net`)",
         "traefik.http.routers.grafana.entrypoints=websecure"
       ]
 
@@ -74,10 +74,11 @@ job "grafana" {
       }
 
       env {
+        TZ = "Europe/Berlin"
+
         GF_LOG_LEVEL = "WARN"
         GF_LOG_MODE = "console"
         GF_PATHS_PROVISIONING = "/etc/grafana/provisioning"
-        TZ = "Europe/Berlin"
       }
 
       resources {

@@ -29,7 +29,7 @@ job "prometheus" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.prometheus.rule=Host(`prometheus.lab.home`)",
+        "traefik.http.routers.prometheus.rule=Host(`prometheus.lab.schoger.net`)",
         "traefik.http.routers.prometheus.entrypoints=websecure"
       ]
 

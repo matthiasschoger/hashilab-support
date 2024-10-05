@@ -41,7 +41,7 @@ job "loki" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.loki.rule=Host(`loki.lab.home`)",
+        "traefik.http.routers.loki.rule=Host(`loki.lab.schoger.net`)",
         "traefik.http.routers.loki.entrypoints=websecure"
       ]
 
@@ -82,7 +82,6 @@ job "loki" {
 
       config {
         image = "grafana/loki:latest"
-#        image = "grafana/loki:2.9.8"
 
         args = [
           "-config.file=/local/config.yml",
