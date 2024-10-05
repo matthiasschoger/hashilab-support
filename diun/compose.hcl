@@ -31,16 +31,19 @@ job "diun" {
 
       env = {
         "TZ" = "Europe/Berlin"
+
         "DIUN_DB_PATH" = "${NOMAD_ALLOC_DIR}/data/diun.db" # remove as soon as configuration via yaml is possible
       }
 
       resources {
         memory = 64
-        cpu    = 50
+        cpu    = 100
       }
 
       template {
         change_mode   = "restart"
+        left_delimiter = "[["
+        right_delimiter = "]]"
         destination = "/secrets/diun.yaml"
         data = <<EOH
 defaults:
@@ -51,7 +54,7 @@ defaults:
 
 
 #db:            # configuration via yaml does not work, using env
-#  path: "{{ env "NOMAD_ALLOC_DIR" }}/data/diun.db"
+#  path: "[[ env "NOMAD_ALLOC_DIR" ]]/data/diun.db"
 
 
 watch:
@@ -62,31 +65,26 @@ watch:
 
 
 notif:
-  teams:
-{{- with nomadVar "nomad/jobs/diun" }}
-    webhookURL: {{ .webhook_url }}
-{{- end }}
+  mail:
+    host: smtp.lab.home
+[[- with nomadVar "nomad/jobs/diun" ]]
+    username: "[[ .email_user ]]"
+    password: "[[ .email_pass ]]"
+    insecureSkipVerify: true
+[[- end ]]
+    from: "matthias.schoger@proton.me"
+    to: "matthias@schoger.net"
+    templateTitle: 'Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}'
 
   webhook:
     endpoint: https://node-red.lab.home/homelab/diun
     method: POST
 
-  mail:
-    host: smtp.lab.home
-{{- with nomadVar "nomad/jobs/diun" }}
-    username: {{ .email_user }}
-    password: {{ .email_pass }}
-    insecureSkipVerify: true
-{{- end }}
-    from: "matthias@schoger.net"
-    to: "matthias@schoger.net"
-    templateTitle: "Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}"
-
 
 providers:
   nomad:
     watchByDefault: true
-    address: "http://{{ env "attr.unique.network.ip-address" }}:4646/"
+    address: "http://[[ env "attr.unique.network.ip-address" ]]:4646/"
 
 EOH
       }
