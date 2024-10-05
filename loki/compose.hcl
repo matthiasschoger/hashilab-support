@@ -38,13 +38,6 @@ job "loki" {
         expose   = true # required for Connect
       }
 
-      tags = [
-        "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.loki.rule=Host(`loki.lab.schoger.net`)",
-        "traefik.http.routers.loki.entrypoints=websecure"
-      ]
-
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_loki}" # make envoy metrics port available in Consul
       }
@@ -66,15 +59,7 @@ job "loki" {
         }
       }
     }
-/*
-    service {
-      name = "rsyslog"
 
-      port = "rsyslog"
-
-      task = "rsyslog"
-    }
-*/
     task "server" {
       driver = "docker"
 
