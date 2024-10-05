@@ -67,7 +67,7 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://lab.home:3100/loki/api/v1/push
+  - url: http://lab.schoger.net:3100/loki/api/v1/push
 
 scrape_configs:
 - job_name: systemd-journal
@@ -205,7 +205,7 @@ sinks:
       codec: "json"
   loki:
     type: "loki"
-    endpoint: "http://lab.home:3100"
+    endpoint: "http://lab.schoger.net:3100"
     healthcheck:
       enabled: true
     inputs: 

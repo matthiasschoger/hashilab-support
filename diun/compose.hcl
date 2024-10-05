@@ -66,7 +66,7 @@ watch:
 
 notif:
   mail:
-    host: smtp.lab.home
+    host: smtp.lab.schoger.net
 [[- with nomadVar "nomad/jobs/diun" ]]
     username: "[[ .email_user ]]"
     password: "[[ .email_pass ]]"
@@ -77,7 +77,7 @@ notif:
     templateTitle: 'Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}'
 
   webhook:
-    endpoint: https://node-red.lab.home/homelab/diun
+    endpoint: https://node-red.lab.schoger.net/homelab/diun
     method: POST
 
 
