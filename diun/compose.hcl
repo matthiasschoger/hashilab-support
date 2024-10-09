@@ -73,7 +73,7 @@ notif:
     insecureSkipVerify: true
 [[- end ]]
     from: "matthias.schoger@proton.me"
-    to: "matthias@schoger.net"
+    to: "info@schoger.net"
     templateTitle: 'Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}'
 
   webhook:
