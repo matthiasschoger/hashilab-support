@@ -14,7 +14,7 @@ prometheus:
 unifi:
   dynamic: false
   defaults:
-    url:  "https://unifi-network.service.consul:18443/"
+    url:  "https://unifi-network.service.consul:8443/"
 {{- with nomadVar "nomad/jobs/prometheus" }}
     user: {{ .unifi_user }}
     pass: {{ .unifi_pass }}
