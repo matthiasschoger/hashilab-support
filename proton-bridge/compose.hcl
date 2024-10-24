@@ -51,7 +51,7 @@ job "proton-bridge" {
       }
 
       resources {
-        memory = 600
+        memory = 512
         cpu    = 200
       }
 
