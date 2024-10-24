@@ -11,6 +11,9 @@ prometheus:
   report_errors: false
   buffer:        50
 
+#loki:
+#  url: "http://loki.lab.home:3100"
+
 unifi:
   dynamic: false
   defaults:
