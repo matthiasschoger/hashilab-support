@@ -41,6 +41,33 @@ job "cloudflare-dyndns" {
       }
     }
 
+    service {
+      name = "cloudflare-dyndns-metrics"
+
+      port = 9090
+
+      check {
+        type     = "http"
+        path     = "/healthz"
+        interval = "5s"
+        timeout  = "2s"
+        expose   = true # required for Connect
+      }
+
+      connect {
+        sidecar_service {
+          proxy { }
+        }
+
+        sidecar_task {
+          resources {
+            cpu    = 50
+            memory = 48
+          }
+        }
+      }
+    }
+
     task "server" {
 
       driver = "docker"
@@ -63,14 +90,8 @@ job "cloudflare-dyndns" {
         env = true
         data = <<EOH
 {{- with nomadVar "nomad/jobs/cloudflare-dyndns" }}
-# pull config
-FRITZBOX_ENDPOINT_URL = "http://fritz.box:49000"
-FRITZBOX_ENDPOINT_INTERVAL = "120s" # poll every two minutes (should not be neccessary since we're usting push)
-
-# push config
-DYNDNS_SERVER_BIND = ":80"
-DYNDNS_SERVER_USERNAME = "ddns"
-DYNDNS_SERVER_PASSWORD = "ddns"
+# metrics and health check port
+METRICS_BIND = ":9090"
 
 CLOUDFLARE_API_EMAIL = "{{- .email }}"
 CLOUDFLARE_API_TOKEN = "{{- .token }}"
