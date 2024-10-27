@@ -52,7 +52,10 @@ job "node-exporter" {
       config {
         image = "prom/node-exporter:latest"
 
-        args  = ["--path.rootfs=/host"]
+        args  = [
+          "--path.rootfs=/host",
+          "--collector.mountstats" # required to collect traffic stats for NFS mounts
+        ]
 
         volumes = [
           "/:/host:ro,rslave",
