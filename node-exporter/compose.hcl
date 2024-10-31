@@ -1,5 +1,5 @@
 job "node-exporter" {
-  datacenters = ["home", "dmz"]
+  datacenters = ["arbiter", "home", "dmz"]
   type        = "system"
 
   group "node-exporter" {
