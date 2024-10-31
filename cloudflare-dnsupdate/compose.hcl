@@ -2,7 +2,7 @@ job "cloudflare-dyndns" {
   datacenters = ["home"]
   type        = "service"
 
-  group "cloudflare-dyndns" {
+  group "cloudflare-dnsupdate" {
 
     constraint {
       attribute = "${node.class}"
@@ -16,7 +16,7 @@ job "cloudflare-dyndns" {
     }
 
     service {
-      name = "cloudflare-dyndns"
+      name = "cloudflare-dnsupdate"
 
       port = 80
 
@@ -42,7 +42,7 @@ job "cloudflare-dyndns" {
     }
 
     service {
-      name = "cloudflare-dyndns-metrics"
+      name = "cloudflare-dnsupdate-metrics"
 
       port = 9090
 
