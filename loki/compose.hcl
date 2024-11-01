@@ -4,11 +4,6 @@ job "loki" {
 
   group "loki" {
 
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
     ephemeral_disk {
       # Used to store index, cache, WAL
       # Nomad will try to preserve the disk between job updates

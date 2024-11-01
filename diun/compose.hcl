@@ -4,11 +4,6 @@ job "diun" {
 
   group "diun" {
 
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
     ephemeral_disk {
       migrate = true
     }

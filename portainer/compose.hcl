@@ -4,11 +4,6 @@ job "portainer" {
 
   group "portainer" {
 
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
     network {
       mode = "bridge"
 

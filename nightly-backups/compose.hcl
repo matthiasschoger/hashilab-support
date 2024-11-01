@@ -13,11 +13,6 @@ job "nightly-backups" {
 
   group "nightly" {
 
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
     task "backups" {
       driver = "exec"
 

@@ -4,11 +4,6 @@ job "proton-bridge" {
 
   group "bridge" {
 
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
     network {
       mode = "bridge"
 
