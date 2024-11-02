@@ -32,4 +32,4 @@ The "support" repository defines mostly operational stuff which makes it easier 
 - portainer - Container management, no longer in use.
 - prometheus - Metrics database, which picks up metrics from the nodes, services and Consul Connect and stores them in a time-series database.
 - proton-bridge - Bridge to my email service Proton Mail. Provides an interface for my services to send out email notifications.
-- weekly-maintenance - Weekly job which provides clean up jobs on all my nodes.
+- weekly-maintenance - Weekly job which runs clean up jobs on all my nodes.
