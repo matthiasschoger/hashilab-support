@@ -25,7 +25,6 @@ The "support" repository defines mostly operational stuff which makes it easier 
 
 - cloudflared - Cloudflare tunnel which exposes some services on the internet. 
 - diun - Update notifications when new releases are available for my services.
-- grafana - Fancy dashboards for all your graph-p*rn needs.
 - log-collection - Log file aggregation of all servers into Loki.
 - loki - Central log file aggregation.
 - nightly-backups - Cron jobs which do online backups of the databased via Nomad Actions.
