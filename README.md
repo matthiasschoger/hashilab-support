@@ -27,9 +27,9 @@ The "support" repository defines mostly operational stuff which makes it easier 
 - diun - Update notifications when new releases are available for my services.
 - log-collection - Log file aggregation of all servers into Loki.
 - loki - Central log file aggregation.
-- nightly-backups - Cron jobs which do online backups of the databased via Nomad Actions.
+- nightly-backups - Cron jobs which do online backups of the databases via Nomad Actions.
 - node-exporter - Provides metrics of all the VMs to Prometheus.
 - portainer - Container management, no longer in use.
-- prometheus - Metrics database, which picks up metrics from the nodes, services and Consul Connect and stores them in a time-series database.
+- prometheus - Metrics database, which picks up metrics from the nodes, services and Consul Connect and stores them in a time-series database. Used by Grafana to do the graph p*rn thing ...
 - proton-bridge - Bridge to my email service Proton Mail. Provides an interface for my services to send out email notifications.
 - weekly-maintenance - Weekly job which runs clean up jobs on all my nodes.
