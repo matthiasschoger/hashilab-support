@@ -1,3 +1,7 @@
+variable "base_domain" {
+  default = "missing.environment.variable"
+}
+
 job "portainer" {
   datacenters = ["home"]
   type        = "service"
@@ -28,7 +32,7 @@ job "portainer" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.portainer.rule=Host(`portainer.lab.schoger.net`)",
+        "traefik.http.routers.portainer.rule=Host(`portainer.lab.${var.base_domain}`)",
         "traefik.http.routers.portainer.entrypoints=websecure"
       ]
 

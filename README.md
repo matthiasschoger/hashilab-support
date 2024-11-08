@@ -33,3 +33,7 @@ The "support" repository defines mostly operational stuff which makes it easier 
 - prometheus - Metrics database, which picks up metrics from the nodes, services and Consul Connect and stores them in a time-series database. Used by Grafana to do the graph p*rn thing. Also picks up metrics about the Unifi network and my Synology NAS with the help of specific exporters.
 - proton-bridge - Bridge to my email service Proton Mail. Provides an endpoint for my services to send out email notifications.
 - weekly-maintenance - Weekly job which runs clean up tasks on all my nodes.
+
+Note: Before deploying a job file, you should set the following environment variable on the deploying machine
+- NOMAD_VAR_base_domain=domain.tld
+where 'domain.tld' is the domain you are using.

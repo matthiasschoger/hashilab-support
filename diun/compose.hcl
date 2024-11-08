@@ -1,3 +1,7 @@
+variable "base_domain" {
+  default = "missing.environment.variable"
+}
+
 job "diun" {
   datacenters = ["home"]
   type = "service"
@@ -61,18 +65,18 @@ watch:
 
 notif:
   mail:
-    host: smtp.lab.schoger.net
+    host: smtp.lab.${var.base_domain}
 [[- with nomadVar "nomad/jobs/diun" ]]
     username: "[[ .email_user ]]"
     password: "[[ .email_pass ]]"
+    from: "[[ .email_user ]]"
+    to: "[[ .email_receipient ]]"
     insecureSkipVerify: true
 [[- end ]]
-    from: "matthias.schoger@proton.me"
-    to: "info@schoger.net"
     templateTitle: 'Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}'
 
   webhook:
-    endpoint: https://node-red.lab.schoger.net/homelab/diun
+    endpoint: https://node-red.lab.${var.base_domain}/homelab/diun
     method: POST
 
 

@@ -17,7 +17,7 @@ prometheus:
 unifi:
   dynamic: false
   defaults:
-    url:  "https://network.lab.schoger.net/"
+    url:  "https://network.lab.${var.base_domain}/"
 {{- with nomadVar "nomad/jobs/prometheus" }}
     user: {{ .unifi_user }}
     pass: {{ .unifi_pass }}

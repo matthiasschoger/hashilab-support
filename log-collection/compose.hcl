@@ -1,3 +1,7 @@
+variable "base_domain" {
+  default = "missing.environment.variable"
+}
+
 job "log-collection" {
   datacenters = ["arbiter", "home", "dmz"]
   type        = "system"
@@ -67,7 +71,7 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://lab.schoger.net:3100/loki/api/v1/push
+  - url: http://lab.${var.base_domain}:3100/loki/api/v1/push
 
 scrape_configs:
 - job_name: systemd-journal
@@ -205,7 +209,7 @@ sinks:
       codec: "json"
   loki:
     type: "loki"
-    endpoint: "http://lab.schoger.net:3100"
+    endpoint: "http://lab.${var.base_domain}:3100"
     healthcheck:
       enabled: true
     inputs: 
