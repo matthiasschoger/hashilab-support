@@ -10,6 +10,7 @@ job "node-exporter" {
       port "metrics" { to = 9100 }
     }
 
+    # the service will be picked up by Prometheus from the Consul service directory, including the metrics port in the meta attribute
     service {
       name = "node-exporter"
 
