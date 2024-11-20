@@ -7,42 +7,16 @@ job "node-exporter" {
     network {
       mode = "bridge"
 
-      port "metrics" { }
-      port "envoy_metrics" { to = 9102 }
+      port "metrics" { to = 9100 }
     }
 
     service {
       name = "node-exporter"
 
-      port = 9100
+      port = "metrics"
 
       meta {
         metrics_port = "${NOMAD_HOST_PORT_metrics}"
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9102"
-            }
-            expose {
-              path {
-                path            = "/metrics"
-                protocol        = "http"
-                local_path_port = 9100
-                listener_port   = "metrics"
-              }
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            memory = 48
-            cpu    = 50
-          }
-        }
       }
     }
 
