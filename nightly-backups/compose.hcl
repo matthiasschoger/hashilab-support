@@ -27,9 +27,9 @@ find /backup/* -mtime +3 -exec rm {} \;
 echo "backing up Unifi Network MongoDB"
 nomad action -job=unifi-network -group=mongodb -task=server backup-mongodb
 echo "backing up Bookstack MariaDB"
-nomad action -job=bookstack -group=bookstack -task=mariadb backup-mariadb
+nomad action -job=bookstack -group=mariadb -task=server backup-mariadb
 echo "backing up Immich Postgres DB"
-nomad action -job=immich -group=immich-postgres -task=postgres backup-postgres
+nomad action -job=immich -group=postgres -task=server backup-postgres
 echo "finished running nightly backups"
 EOF
         ]

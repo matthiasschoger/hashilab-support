@@ -27,6 +27,11 @@ job "log-collection" {
     #         config {
     #           envoy_prometheus_bind_addr = "0.0.0.0:9102"
     #         }
+
+    #         upstreams {
+    #             destination_name = "loki"
+    #             local_bind_port  = 3100
+    #         }
     #       }
     #     }
 
@@ -72,7 +77,8 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://lab.${var.base_domain}:3100/loki/api/v1/push
+  - url: http://loki.lab.${var.base_domain}:3100/loki/api/v1/push
+#  - url: http://localhost:3100/loki/api/v1/push
 
 scrape_configs:
 - job_name: systemd-journal
