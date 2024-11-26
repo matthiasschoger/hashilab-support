@@ -59,7 +59,10 @@ job "prometheus" {
       config {
         image = "prom/prometheus:latest"
 
-        args = ["--config.file", "/local/prometheus/prometheus.yaml"]
+        args = [
+                "--config.file", "/local/prometheus/prometheus.yaml",
+                "--log.level", "warn"
+               ]
       }
 
       env {
