@@ -135,26 +135,6 @@ scrape_configs:
       replacement: ${1}.home
       target_label: instance
 
-  - job_name: 'immich'
-    consul_sd_configs:
-    - server: 'consul.service.consul:8500'
-      services: ['immich-api','immich-worker']
-    relabel_configs: # see https://github.com/immich-app/immich/discussions/8191
-    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: ${1}:${2}
-      target_label: __address__
-    - source_labels: [__meta_consul_node]
-      regex: (.*)
-      replacement: ${1}.home
-      target_label: instance
-    metric_relabel_configs:
-    - source_labels: [ __name__ ]
-      target_label: __name__
-      regex: '(.*)'
-      action: replace
-      replacement: immich_${1}
-
   - job_name: 'cloudflared'
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
@@ -228,3 +208,12 @@ scrape_configs:
       replacement: ${1}
       target_label: instance
 
+  - job_name: 'immich'
+    static_configs:
+    - targets: 
+      - 'localhost:8000'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
