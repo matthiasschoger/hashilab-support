@@ -13,7 +13,7 @@ job "cloudflare-dyndns" {
     service {
       name = "cloudflare-dnsupdate"
 
-      port = 80
+      port = 8080
 
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
