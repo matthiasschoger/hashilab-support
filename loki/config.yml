@@ -5,12 +5,10 @@ server:
   http_listen_port: 3100
 
 common:
+  replication_factor: 1
   ring:
-    instance_addr: 127.0.0.1
     kvstore:
       store: inmemory
-  replication_factor: 1
-  path_prefix: /tmp/loki
 
 ingester:
   lifecycler:
@@ -25,15 +23,14 @@ ingester:
   wal:
     dir: {{ env "NOMAD_ALLOC_DIR" }}/data/wal
     flush_on_shutdown: true
-    replay_memory_ceiling: "1G"
+    replay_memory_ceiling: "800M"
 
 compactor:
   working_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-compactor
-#  shared_store: filesystem
 
 schema_config:
   configs:
-    - from: 2024-07-11
+    - from: 2025-01-01
       store: tsdb
       object_store: filesystem
       schema: v13
@@ -42,13 +39,12 @@ schema_config:
         period: 24h
 
 storage_config:
-#  filesystem:
-#    directory: /loki/chunks
+  filesystem:
+    directory: /loki/chunks
   tsdb_shipper:
     active_index_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-active
     cache_location: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-cache
     cache_ttl: 24h         # Can be increased for faster performance over longer query periods, uses more disk space
-#    shared_store: filesystem
 
 limits_config:
   reject_old_samples: true
@@ -62,5 +58,5 @@ chunk_store_config:
       max_size_mb: 1000
       ttl: 24h
 
-query_range:
-  parallelise_shardable_queries: false # helps with "context canceled" messages I'm getting
+#query_range:
+#  parallelise_shardable_queries: false # helps with "context canceled" messages I'm getting

@@ -14,10 +14,10 @@ job "loki" {
     network {
       mode = "bridge"
 
-      port "rsyslog" { static = 514 }
+      # port "rsyslog" { static = 514 }
 
       port "envoy_metrics_loki" { to = 9102 }
-      port "envoy_metrics_syslog" { to = 9103 }
+#      port "envoy_metrics_syslog" { to = 9103 }
     }
 
     service {
@@ -40,7 +40,6 @@ job "loki" {
         sidecar_service {
           proxy {
             config {
-              protocol = "http"
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
             }
           }
