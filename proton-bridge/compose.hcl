@@ -15,7 +15,7 @@ job "proton-bridge" {
 
       port = 1025
 
-     meta {
+      meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_smtp}" # make envoy metrics port available in Consul
       }
       connect {
@@ -46,7 +46,7 @@ job "proton-bridge" {
       }
 
       resources {
-        memory = 512
+        memory = 786
         cpu    = 200
       }
 
