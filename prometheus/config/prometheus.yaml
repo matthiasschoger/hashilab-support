@@ -98,7 +98,7 @@ scrape_configs:
       replacement: ${1}
       target_label: "service_name"
 
-  - job_name: envoy-prometheus # for the local Prometheus proxy, prometheus cannot connect to it's own proxy
+  - job_name: envoy-prometheus # for the local Prometheus Consul Connect proxy, prometheus cannot connect to it's own proxy via SD
     static_configs: 
       - targets:
           - 'localhost:9102'
@@ -136,6 +136,11 @@ scrape_configs:
       regex: (.*)
       replacement: ${1}.home
       target_label: instance
+    metric_relabel_configs:
+    - source_labels: [service]
+      regex: "(.*)@.*"
+      replacement: ${1}
+      target_label: service_name
 
   - job_name: 'traefik-crowdsec'
     consul_sd_configs:
