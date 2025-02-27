@@ -46,6 +46,10 @@ job "prometheus" {
                 destination_name = "unifi-network-unpoller"
                 local_bind_port  = 9130
             }
+            upstreams {
+              destination_name = "immich-exporter"
+              local_bind_port  = 8000
+            }
           }
         }
 
@@ -119,37 +123,6 @@ job "prometheus" {
       resources {
         cpu    = 50
         memory = 32
-      }
-    }
-
-    # Immich exporter for Prometheus
-    task "immich-exporter" {
-      driver = "docker"
-
-      config {
-        image = "friendlyfriend/prometheus-immich-exporter:latest"
-      }
-
-      env {
-        TZ = "Europe/Berlin"
-      }
-
-      template {
-        destination = "secrets/immich.env"
-        env             = true
-        data            = <<EOH
-{{- with nomadVar "nomad/jobs/prometheus" }}
-# upstream in proxy conf
-IMMICH_HOST      = localhost
-IMMICH_PORT      = 2283
-IMMICH_API_TOKEN = "{{- .immich_api_key }}"
-{{- end }}
-EOH
-      }
-
-      resources {
-        cpu    = 50
-        memory = 48
       }
     }
   
