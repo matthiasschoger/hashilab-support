@@ -19,6 +19,7 @@ job "weekly-maintenance" {
         command = "/bin/sh"
         # add additional weekly maintenance actions as desired
         args    = ["-c", <<EOF
+echo "running weekly maintenance on $(hostname).home"
 echo "cleaning up docker resources"
 docker system prune --all --force
 echo "finished cleaning up docker resources"
