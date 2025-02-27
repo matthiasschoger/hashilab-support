@@ -42,6 +42,10 @@ job "prometheus" {
                 destination_name = "immich-api"
                 local_bind_port  = 2283
             }
+            upstreams { 
+                destination_name = "unifi-network-unpoller"
+                local_bind_port  = 9130
+            }
           }
         }
 
@@ -118,33 +122,6 @@ job "prometheus" {
       }
     }
 
-    # Unifi exporter for Prometheus
-    task "unifi-exporter" {
-      driver = "docker"
-
-      config {
-        image = "ghcr.io/unpoller/unpoller:latest"
-
-        args  = [
-          "--config=/local/unpoller.yaml"
-        ]
-      }
-
-      env {
-        TZ = "Europe/Berlin"
-      }
-
-      template {
-        data        = file("config/unpoller.yaml")
-        destination = "/local/unpoller.yaml"
-      }
-
-      resources {
-        cpu    = 50
-        memory = 48
-      }
-    }
-  
     # Immich exporter for Prometheus
     task "immich-exporter" {
       driver = "docker"
