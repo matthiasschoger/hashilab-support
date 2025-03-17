@@ -49,6 +49,10 @@ job "traefik-dmz" {
             config {
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
             }
+            upstreams { 
+                destination_name = "traefik-crowdsec-postgres"
+                local_bind_port  = 5432
+            }
           }
         }
 
@@ -181,17 +185,23 @@ common:
   log_level: info
 
 config_paths:
-#  config_dir: "<path_to_crowdsec_config_folder>"
   data_dir: "/alloc/data/crowdsec/data"
 
-#db_config:
-#  db_path:  "/alloc/data/crowdsec/db/crowdsec.db"
+db_config:
+  type:    postgresql
+  db_name: crowdsec  
+  user:    crowdsec
+{{- with nomadVar "nomad/jobs/traefik-dmz" }}
+  password: "{{- .crowdsec_postgres_pass }}"
+{{- end }}
+  host:    localhost
+  port:    5432
+  sslmode: disable
 
 prometheus:
   enabled: true
   level: full
   listen_addr: 0.0.0.0
-
 EOH
       }
 
@@ -225,21 +235,9 @@ EOH
       }
 
       volume_mount {
-        volume      = "crowdsec-db"
-        destination = "/var/lib/crowdsec/data"
-      }    
-
-      volume_mount {
         volume      = "crowdsec-etc"
         destination = "/etc/crowdsec"
       }    
-    }
-  
-    volume "crowdsec-db" {
-      type            = "csi"
-      source          = "crowdsec-db"
-      access_mode     = "single-node-writer"
-      attachment_mode = "file-system"
     }
   
     volume "crowdsec-etc" {
@@ -249,4 +247,123 @@ EOH
       attachment_mode = "file-system"
     }
   }
+
+# --- Postgres database ---
+
+  group "postgres" {
+
+    network {
+      mode = "bridge"
+
+      port "envoy_metrics" { to = 9101 }
+    }
+
+    service {
+      name = "traefik-crowdsec-postgres"
+      task = "postgres"
+
+      port = 5432
+
+      check {
+        type     = "script"
+        command  = "sh"
+        args     = ["-c", "psql -U $POSTGRES_USER -d crowdsec  -c 'SELECT 1' || exit 1"]
+        interval = "10s"
+        timeout  = "2s"
+      }
+
+      meta {
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
+      }
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9101"
+            }
+          }
+        }
+
+        sidecar_task {
+          resources {
+            cpu    = 50
+            memory = 50
+          }
+        }
+      }
+    }
+
+    task "postgres" {
+      driver = "docker"
+
+      # proper user id is required 
+      user = "1026:100" # matthias:users
+
+      # backs up the Postgres database and removes all files in the backup folder which are older than 3 days.
+      action "backup-postgres" {
+        command = "/bin/sh"
+        args    = ["-c", <<EOF
+pg_dumpall -U $POSTGRES_USER | gzip --rsyncable > /var/lib/postgresql/data/backup/backup.$(date +"%Y%m%d%H%M").sql.gz
+echo "cleaning up backup files older than 3 days ..."
+find /var/lib/postgresql/data/backup/* -mtime +3 -exec rm {} \;
+EOF
+        ]
+      }
+
+      config {
+         image = "postgres:15"
+
+        volumes = [
+          "secrets/initdb:/docker-entrypoint-initdb.d:ro",
+        ]      
+      }
+
+      env {
+        TZ = "Europe/Berlin"
+      }
+
+      template {
+        destination = "secrets/variables.env"
+        env         = true
+        perms       = 400
+        data        = <<EOH
+{{- with nomadVar "nomad/jobs/traefik-dmz" }}
+POSTGRES_PASSWORD = {{- .crowdsec_postgres_pass }}
+POSTGRES_USER     = "crowdsec"
+DB_URL            = postgres://crowdsec:{{- .crowdsec_postgres_pass }}@127.0.0.1:5432/crowdsec
+{{- end }}
+EOH
+      }
+
+      template {
+        destination = "secrets/initdb/init-postgres.sql"
+        data = <<EOH
+{{- with nomadVar "nomad/jobs/traefik-dmz" }}
+CREATE DATABASE crowdsec;
+CREATE USER crowdsec WITH PASSWORD '{{- .crowdsec_postgres_pass }}';
+ALTER SCHEMA public owner to crowdsec;
+GRANT ALL PRIVILEGES ON DATABASE crowdsec TO crowdsec;
+{{- end }}
+EOH
+      }
+
+      volume_mount {
+        volume      = "crowdsec-postgres"
+        destination = "/var/lib/postgresql/data"
+      }
+
+      resources {
+        cpu    = 200
+        memory = 128
+      }
+    }
+ 
+    volume "crowdsec-postgres" {
+      type            = "csi"
+      source          = "crowdsec-postgres"
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
+    }
+  }
+
 }
