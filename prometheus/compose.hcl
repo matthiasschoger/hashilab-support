@@ -38,18 +38,6 @@ job "prometheus" {
             config {
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
             }
-            upstreams { # immich-exporter is http only
-                destination_name = "immich-api"
-                local_bind_port  = 2283
-            }
-            upstreams { 
-                destination_name = "unifi-network-unpoller"
-                local_bind_port  = 9130
-            }
-            upstreams {
-              destination_name = "immich-exporter"
-              local_bind_port  = 8000
-            }
           }
         }
 
@@ -99,7 +87,7 @@ job "prometheus" {
 
     ### Exporters
 
-    # snmp exporter for Prometheus
+    # snmp exporter for the Synology metrics
     task "snmp-exporter" {
       driver = "docker"
 

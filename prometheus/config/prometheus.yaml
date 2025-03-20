@@ -214,26 +214,34 @@ scrape_configs:
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
-      - source_labels: [__param_target] # wtf? This configures the SNMP Exporter endpoint      
+      - source_labels: [__param_target] # This configures the SNMP Exporter endpoint      
         regex: (.*)
         replacement: localhost:9116
         target_label: __address__
 
   - job_name: 'unifipoller'
-    static_configs:
-    - targets: 
-      - 'localhost:9130'
+    consul_sd_configs:
+      - server: 'consul.service.consul:8500'
+        services: ['unifi-network-unpoller']
     relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
     - source_labels: [__address__] # strip port from instance name
       regex: ([^:]+):.*
       replacement: ${1}
       target_label: instance
 
   - job_name: 'immich'
-    static_configs:
-    - targets: 
-      - 'localhost:8000'
+    consul_sd_configs:
+      - server: 'consul.service.consul:8500'
+        services: ['immich-exporter']
     relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
     - source_labels: [__address__] # strip port from instance name
       regex: ([^:]+):.*
       replacement: ${1}
