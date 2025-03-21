@@ -260,12 +260,12 @@ EOH
 
     service {
       name = "traefik-crowdsec-postgres"
-      task = "postgres"
 
       port = 5432
 
       check {
         type     = "script"
+        task = "server"
         command  = "sh"
         args     = ["-c", "psql -U $POSTGRES_USER -d crowdsec  -c 'SELECT 1' || exit 1"]
         interval = "10s"
@@ -293,7 +293,7 @@ EOH
       }
     }
 
-    task "postgres" {
+    task "server" {
       driver = "docker"
 
       # proper user id is required 

@@ -29,7 +29,9 @@ nomad action -job=unifi-network -group=mongodb -task=server backup-mongodb
 echo "backing up Bookstack MariaDB"
 nomad action -job=bookstack -group=mariadb -task=server backup-mariadb
 echo "backing up Immich Postgres DB"
-nomad action -job=immich -group=postgres -task=server backup-postgres
+nomad action -job=immich -group=backend -task=postgres backup-postgres
+echo "backing up Traefik-DMZ Postgres DB"
+nomad action -job=traefik-dmz -group=postgres -task=server backup-postgres
 echo "finished running nightly backups"
 EOF
         ]
