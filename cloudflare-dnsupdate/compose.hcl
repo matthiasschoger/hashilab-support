@@ -39,36 +39,8 @@ job "cloudflare-dyndns" {
       }
     }
 
-    service {
-      name = "cloudflare-dnsupdate-metrics"
-
-      port = 9090
-
-      check {
-        type     = "http"
-        path     = "/healthz"
-        interval = "5s"
-        timeout  = "2s"
-        expose   = true # required for Connect
-      }
-
-      connect {
-        sidecar_service {
-          proxy { }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 10
-            memory = 32
-          }
-        }
-      }
-    }
-
     task "server" {
-
-      driver = "docker"
+     driver = "docker"
 
       config {
         image = "ghcr.io/cromefire/fritzbox-cloudflare-dyndns:latest"
@@ -81,8 +53,6 @@ job "cloudflare-dyndns" {
         FRITZBOX_ENDPOINT_URL = "http://fritz.box:49000"
         FRITZBOX_ENDPOINT_INTERVAL = "300s"
         FRITZBOX_ENDPOINT_TIMEOUT  = "10s"
-        # metrics and health check port
-        METRICS_BIND = ":9090"
       }
 
       template {
@@ -94,7 +64,6 @@ CLOUDFLARE_API_EMAIL  = "{{- .email }}"
 CLOUDFLARE_API_TOKEN  = "{{- .token }}"
 CLOUDFLARE_ZONES_IPV4 = "{{- .zone }}"
 CLOUDFLARE_ZONES_IPV6 = "{{- .zone }}"
-# DEVICE_LOCAL_ADDRESS_IPV6 = "::1:0:0:0:2" # UXG-lite postfix
 {{- end }}
 EOH
       }
