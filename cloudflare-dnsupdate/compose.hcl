@@ -10,6 +10,9 @@ job "cloudflare-dyndns" {
       port "envoy_metrics" { to = 9102 }
     }
 
+    # receives a callback from the router when the IP changes -> update Cloudflare DNS entries
+    #  example URL: 192.168.0.3:1080/ip?v4=<ipaddr>&v6=<ip6addr>&prefix=<ip6lanprefix>&username=<username>&password=<pass>
+    #  adjust to your router as needed
     service {
       name = "cloudflare-dnsupdate"
 
@@ -68,11 +71,7 @@ job "cloudflare-dyndns" {
       driver = "docker"
 
       config {
-        # receives a callback from the router when the IP changes -> update Cloudflare DNS entries
         image = "ghcr.io/cromefire/fritzbox-cloudflare-dyndns:latest"
-
-        # example URL: 192.168.0.3:1080/ip?v4=<ipaddr>&v6=<ip6addr>&prefix=<ip6lanprefix>&username=<username>&password=<pass>
-        # adjust to your router as needed
       }
 
       env {
