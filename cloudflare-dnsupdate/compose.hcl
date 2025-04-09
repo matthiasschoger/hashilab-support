@@ -69,7 +69,6 @@ job "cloudflare-dyndns" {
 
       config {
         # receives a callback from the router when the IP changes -> update Cloudflare DNS entries
-
         image = "ghcr.io/cromefire/fritzbox-cloudflare-dyndns:latest"
 
         # example URL: 192.168.0.3:1080/ip?v4=<ipaddr>&v6=<ip6addr>&prefix=<ip6lanprefix>&username=<username>&password=<pass>
@@ -78,6 +77,13 @@ job "cloudflare-dyndns" {
 
       env {
         TZ = "Europe/Berlin"
+
+        # Fritz!Box endpoint for polling
+        FRITZBOX_ENDPOINT_URL = "http://fritz.box:49000"
+        FRITZBOX_ENDPOINT_INTERVAL = "300s"
+        FRITZBOX_ENDPOINT_TIMEOUT  = "10s"
+        # metrics and health check port
+        METRICS_BIND = ":9090"
       }
 
       template {
@@ -85,11 +91,8 @@ job "cloudflare-dyndns" {
         env = true
         data = <<EOH
 {{- with nomadVar "nomad/jobs/cloudflare-dyndns" }}
-# metrics and health check port
-METRICS_BIND = ":9090"
-
-CLOUDFLARE_API_EMAIL = "{{- .email }}"
-CLOUDFLARE_API_TOKEN = "{{- .token }}"
+CLOUDFLARE_API_EMAIL  = "{{- .email }}"
+CLOUDFLARE_API_TOKEN  = "{{- .token }}"
 CLOUDFLARE_ZONES_IPV4 = "{{- .zone }}"
 CLOUDFLARE_ZONES_IPV6 = "{{- .zone }}"
 # DEVICE_LOCAL_ADDRESS_IPV6 = "::1:0:0:0:2" # UXG-lite postfix
