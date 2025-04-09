@@ -32,8 +32,8 @@ job "cloudflare-dyndns" {
 
         sidecar_task {
           resources {
-            cpu    = 50
-            memory = 48
+            cpu    = 10
+            memory = 32
           }
         }
       }
@@ -59,8 +59,8 @@ job "cloudflare-dyndns" {
 
         sidecar_task {
           resources {
-            cpu    = 50
-            memory = 48
+            cpu    = 10
+            memory = 32
           }
         }
       }
