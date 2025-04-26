@@ -100,40 +100,6 @@ job "traefik-dmz" {
       }
     }
 
-    # Crowdsec API
-    service {
-      name = "traefik-dmz-crowdsec"
-
-      port = 8080
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_crowdsec_api}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9104"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 48
-          }
-        }
-      }
-
-      tags = [ # registers the DMZ Traefik instance with the home instance
-        "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.traefik-crowdsec.rule=Host(`crowdsec.lab.${var.base_domain}`)",
-        "traefik.http.routers.traefik-crowdsec.entrypoints=websecure"
-      ]
-    }
-
     task "server" {
 
       driver = "docker"
@@ -192,22 +158,10 @@ EOH
       config {
         image = "crowdsecurity/crowdsec:latest"
 
-        mounts = [ # map config files into container
-          {
-            type   = "bind"
-            source = "local/crowdsec/config.yaml.local"
-            target = "/etc/crowdsec/config.yaml.local"
-          },
-          {
-            type   = "bind"
-            source = "local/crowdsec/acquis.yaml"
-            target = "/etc/crowdsec/acquis.yaml"
-          },
-          {
-            type   = "bind"
-            source = "local/crowdsec/notifications/http.yaml"
-            target = "/etc/crowdsec/notifications/http.yaml"
-          }
+        volumes = [
+          "local/crowdsec/config.yaml.local:/etc/crowdsec/config.yaml.local:ro",
+          "local/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:ro",
+          "local/crowdsec/notifications/http.yaml:/etc/crowdsec/notifications/http.yaml:ro",
         ]
       }
 
@@ -224,8 +178,8 @@ common:
 #  log_level: debug
   log_level: info
 
-# config_paths:
-#   data_dir: "/alloc/data/crowdsec/data"
+config_paths:
+  data_dir: "/alloc/data/crowdsec"
 
 db_config:
   type:    postgresql
@@ -269,7 +223,7 @@ labels:
 EOH
       }
 
-      template { # http notifications, which pushes lapi decisions to the Prometheus push endpoint
+      template { # http notification, which pushes lapi decisions to the Prometheus push endpoint
         destination = "/local/crowdsec/notifications/http.yaml"
         left_delimiter  = "[["
         right_delimiter = "]]"
@@ -281,14 +235,14 @@ log_level: debug
 format: |
   {{- range $Alert := . -}}
   {{- range .Decisions -}}
-  {"metric":{"__name__":"cs_lapi_decision","instance":"schoger.net","country":"{{$Alert.Source.Cn}}","asname":"{{$Alert.Source.AsName}}","asnumber":"{{$Alert.Source.AsNumber}}","latitude":"{{$Alert.Source.Latitude}}","longitude":"{{$Alert.Source.Longitude}}","iprange":"{{$Alert.Source.Range}}","scenario":"{{.Scenario}}","type":"{{.Type}}","duration":"{{.Duration}}","scope":"{{.Scope}}","ip":"{{.Value}}"},"values": [1],"timestamps":[{{now|unixEpoch}}000]}
-#  cs_lapi_decision{instance="HTPC",country="{{$Alert.Source.Cn}}",asname="{{$Alert.Source.AsName}}",asnumber="{{$Alert.Source.AsNumber}}",latitude="{{$Alert.Source.Latitude}}",longitude="{{$Alert.Source.Longitude}}",iprange="{{$Alert.Source.Range}}",scenario="{{.Scenario}}",type="{{.Type}}",duration="{{.Duration}}",scope="{{.Scope}}",ip="{{.Value}}"} 1
+#  {"metric":{"__name__":"cs_lapi_decision","instance":"schoger.net","country":"{{$Alert.Source.Cn}}","asname":"{{$Alert.Source.AsName}}","asnumber":"{{$Alert.Source.AsNumber}}","latitude":"{{$Alert.Source.Latitude}}","longitude":"{{$Alert.Source.Longitude}}","iprange":"{{$Alert.Source.Range}}","scenario":"{{.Scenario}}","type":"{{.Type}}","duration":"{{.Duration}}","scope":"{{.Scope}}","ip":"{{.Value}}"},"values": [1],"timestamps":[{{now|unixEpoch}}000]}
+  cs_lapi_decision{instance="schoger.net",country="{{$Alert.Source.Cn}}",asname="{{$Alert.Source.AsName}}",asnumber="{{$Alert.Source.AsNumber}}",latitude="{{$Alert.Source.Latitude}}",longitude="{{$Alert.Source.Longitude}}",iprange="{{$Alert.Source.Range}}",scenario="{{.Scenario}}",type="{{.Type}}",duration="{{.Duration}}",scope="{{.Scope}}",ip="{{.Value}}"} 1
   {{- end }}
   {{- end }}
 
-[[ with nomadVar "nomad/jobs" ]]
+[[- with nomadVar "nomad/jobs" ]]
 url: https://prom-push.lab.[[ .base_domain ]]/metrics/job/crowdsec
-[[ end ]]
+[[- end ]]
 
 method: POST
 headers:
@@ -299,20 +253,8 @@ EOH
 
       resources {
         memory = 256
-        cpu    = 400
+        cpu    = 600
       }
-
-      # volume_mount {
-      #   volume      = "crowdsec-etc"
-      #   destination = "/etc/crowdsec"
-      # }    
-    }
-  
-    volume "crowdsec-etc" {
-      type            = "csi"
-      source          = "crowdsec-etc"
-      access_mode     = "single-node-writer"
-      attachment_mode = "file-system"
     }
   }
 
@@ -433,5 +375,4 @@ EOH
       attachment_mode = "file-system"
     }
   }
-
 }
