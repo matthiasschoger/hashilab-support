@@ -10,6 +10,9 @@ job "prometheus" {
 
     network {
       mode = "bridge"
+
+      port "envoy_metrics_prometheus" { to = 9101 }
+      port "envoy_metrics_pushgateway" { to = 9102 }
     }
 
     service {
@@ -32,6 +35,50 @@ job "prometheus" {
         "traefik.http.routers.prometheus.entrypoints=websecure"
       ]
 
+      meta {
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_prometheus}" # make envoy metrics port available in Consul
+      }
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9101"
+            }
+          }
+        }
+
+        sidecar_task {
+          resources {
+            cpu    = 50
+            memory = 64
+          }
+        }
+      }
+    }
+
+    service {
+      name = "prometheus-pushgateway"
+      
+      port = 9091
+
+      check {
+        type     = "http"
+        path     = "/-/ready"
+        interval = "5s"
+        timeout  = "2s"
+        expose   = true # required for Connect
+      }
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.prom-push.rule=Host(`prom-push.lab.${var.base_domain}`)",
+        "traefik.http.routers.prom-push.entrypoints=websecure"
+      ]
+
+      meta {
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_pushgateway}" # make envoy metrics port available in Consul
+      }
       connect {
         sidecar_service {
           proxy {
@@ -84,6 +131,25 @@ job "prometheus" {
         destination = "/prometheus"
       }    
     }
+
+    # Push gateway, see https://github.com/sa06/prometheus-pushgateway/blob/master/README.md
+    #  currently used by crowdsec to push geocoded intrusion attempts
+    task "push-gateway" {
+      driver = "docker"
+
+      config {
+        image = "prom/pushgateway:latest"
+      }
+
+      env {
+        TZ = "Europe/Berlin"
+      }
+
+      resources {
+        cpu    = 50
+        memory = 32
+      }
+    }    
 
     ### Exporters
 

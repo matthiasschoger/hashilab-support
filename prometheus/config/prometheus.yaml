@@ -18,10 +18,41 @@ rule_files:
   # - "second_rules.yml"
 
 # scrape configurations
+# metrics_path: /metrics # metrics_path defaults to '/metrics'
+# scheme defaults to 'http'.
 scrape_configs:
+  - job_name: push-gateway
+    static_configs:
+    - targets: ['localhost:9091']
+      labels:
+        service: 'prom-pushgateway'
+
+  - job_name: envoy-prometheus # for the local Prometheus Consul Connect proxy, prometheus cannot connect to it's own proxy via SD
+    static_configs: 
+      - targets:
+          - 'localhost:9102'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
+
+  - job_name: 'consul'
+    metrics_path: /v1/agent/metrics
+    params:
+      format: ['prometheus']
+    static_configs:
+      - targets:
+          - 'compute1.home:8500'
+          - 'compute2.home:8500'
+          - 'master.home:8500'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
+
   - job_name: node-exporter-host
-    # metrics_path: /metrics # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
     static_configs:
       - targets:
           - 'storage.home:9100'
@@ -32,6 +63,55 @@ scrape_configs:
       regex: ([^:]+):.*
       replacement: ${1}
       target_label: instance
+
+  - job_name: 'core-dns'
+    static_configs:
+      - targets:
+          - 'compute1.home:9153'
+          - 'compute2.home:9153'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
+
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - 'localhost:9090'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
+
+  - job_name: cadvisor
+    static_configs:
+    - targets:
+      - storage.home:9117
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
+
+  - job_name: snmp # https://mariushosting.com/monitor-your-synology-with-grafana-and-prometheus-dashboard/
+    static_configs:
+      - targets: 
+          - 'storage.home'
+    metrics_path: /snmp
+    params:
+      auth: [snmp_v3]
+      module: [synology]
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__param_target] # This configures the SNMP Exporter endpoint      
+        regex: (.*)
+        replacement: localhost:9116
+        target_label: __address__
 
   - job_name: node-exporter-consul
     consul_sd_configs:
@@ -98,31 +178,6 @@ scrape_configs:
       replacement: ${1}
       target_label: "service_name"
 
-  - job_name: envoy-prometheus # for the local Prometheus Consul Connect proxy, prometheus cannot connect to it's own proxy via SD
-    static_configs: 
-      - targets:
-          - 'localhost:9102'
-    relabel_configs:
-    - source_labels: [__address__] # strip port from instance name
-      regex: ([^:]+):.*
-      replacement: ${1}
-      target_label: instance
-
-  - job_name: 'consul'
-    metrics_path: /v1/agent/metrics
-    params:
-      format: ['prometheus']
-    static_configs:
-      - targets:
-          - 'compute1.home:8500'
-          - 'compute2.home:8500'
-          - 'master.home:8500'
-    relabel_configs:
-    - source_labels: [__address__] # strip port from instance name
-      regex: ([^:]+):.*
-      replacement: ${1}
-      target_label: instance
-
   - job_name: 'traefik'
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
@@ -169,55 +224,6 @@ scrape_configs:
       regex: (.*)
       replacement: ${1}.home
       target_label: instance
-
-  - job_name: 'core-dns'
-    static_configs:
-      - targets:
-          - 'compute1.home:9153'
-          - 'compute2.home:9153'
-    relabel_configs:
-    - source_labels: [__address__] # strip port from instance name
-      regex: ([^:]+):.*
-      replacement: ${1}
-      target_label: instance
-
-  - job_name: prometheus
-    static_configs:
-      - targets:
-          - 'localhost:9090'
-    relabel_configs:
-    - source_labels: [__address__] # strip port from instance name
-      regex: ([^:]+):.*
-      replacement: ${1}
-      target_label: instance
-
-  - job_name: cadvisor
-    static_configs:
-    - targets:
-      - storage.home:9117
-    relabel_configs:
-    - source_labels: [__address__] # strip port from instance name
-      regex: ([^:]+):.*
-      replacement: ${1}
-      target_label: instance
-
-  - job_name: snmp # https://mariushosting.com/monitor-your-synology-with-grafana-and-prometheus-dashboard/
-    static_configs:
-      - targets: 
-          - 'storage.home'
-    metrics_path: /snmp
-    params:
-      auth: [snmp_v3]
-      module: [synology]
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - source_labels: [__param_target] # This configures the SNMP Exporter endpoint      
-        regex: (.*)
-        replacement: localhost:9116
-        target_label: __address__
 
   - job_name: 'unifipoller'
     consul_sd_configs:
