@@ -171,6 +171,17 @@ EOH
         COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-crs"
       }
 
+      template { 
+        destination = "secrets/crowdsec/online_api_credentials.yaml"
+        data = <<EOH
+url: https://api.crowdsec.net/
+{{- with nomadVar "nomad/jobs/traefik-dmz" }}
+login: "{{- .crowdsec_online_login }}"
+password: "{{- .crowdsec_online_password }}"
+{{- end }}
+EOH
+      }
+
       template {
         destination = "/local/crowdsec/config.yaml.local"
         data = <<EOH
@@ -178,8 +189,8 @@ common:
 #  log_level: debug
   log_level: info
 
-config_paths:
-  data_dir: "/alloc/data/crowdsec"
+# config_paths:
+#   data_dir: "/alloc/data/crowdsec"
 
 db_config:
   type:    postgresql
@@ -192,13 +203,17 @@ db_config:
   port:    5432
   sslmode: disable
 
+api:
+  server:
+    online_client:
+      credentials_path: "/secrets/crowdsec/online_api_credentials.yaml"
+
 prometheus:
   enabled: true
   level: full
   listen_addr: 0.0.0.0
 EOH
       }
-
 
       template {
         destination = "/local/crowdsec/acquis.yaml"
@@ -232,10 +247,10 @@ type: http
 name: http_default
 log_level: debug
 # log_level: info
+
 format: |
   {{- range $Alert := . -}}
   {{- range .Decisions -}}
-#  {"metric":{"__name__":"cs_lapi_decision","instance":"schoger.net","country":"{{$Alert.Source.Cn}}","asname":"{{$Alert.Source.AsName}}","asnumber":"{{$Alert.Source.AsNumber}}","latitude":"{{$Alert.Source.Latitude}}","longitude":"{{$Alert.Source.Longitude}}","iprange":"{{$Alert.Source.Range}}","scenario":"{{.Scenario}}","type":"{{.Type}}","duration":"{{.Duration}}","scope":"{{.Scope}}","ip":"{{.Value}}"},"values": [1],"timestamps":[{{now|unixEpoch}}000]}
   cs_lapi_decision{instance="schoger.net",country="{{$Alert.Source.Cn}}",asname="{{$Alert.Source.AsName}}",asnumber="{{$Alert.Source.AsNumber}}",latitude="{{$Alert.Source.Latitude}}",longitude="{{$Alert.Source.Longitude}}",iprange="{{$Alert.Source.Range}}",scenario="{{.Scenario}}",type="{{.Type}}",duration="{{.Duration}}",scope="{{.Scope}}",ip="{{.Value}}"} 1
   {{- end }}
   {{- end }}
