@@ -159,9 +159,9 @@ EOH
         image = "crowdsecurity/crowdsec:latest"
 
         volumes = [
-          "local/crowdsec/config.yaml.local:/etc/crowdsec/config.yaml.local:ro",
-          "local/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:ro",
-          "local/crowdsec/notifications/http.yaml:/etc/crowdsec/notifications/http.yaml:ro",
+          "local/crowdsec/config.yaml.local:/etc/crowdsec/config.yaml.local",
+          "local/crowdsec/acquis.d:/etc/crowdsec/acquis.d",
+          "local/crowdsec/notifications/http.yaml:/etc/crowdsec/notifications/http.yaml",
         ]
       }
 
@@ -171,7 +171,7 @@ EOH
         COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-crs"
       }
 
-      template { 
+      template { # fetch login information from container after executing "clcli enroll"
         destination = "secrets/crowdsec/online_api_credentials.yaml"
         data = <<EOH
 url: https://api.crowdsec.net/
@@ -186,12 +186,8 @@ EOH
         destination = "/local/crowdsec/config.yaml.local"
         data = <<EOH
 common:
-#  log_level: debug
+  # log_level: debug
   log_level: info
-
-# config_paths:
-#   data_dir: "/alloc/data/crowdsec"
-
 db_config:
   type:    postgresql
   db_name: crowdsec  
@@ -202,12 +198,10 @@ db_config:
   host:    localhost
   port:    5432
   sslmode: disable
-
 api:
   server:
     online_client:
       credentials_path: "/secrets/crowdsec/online_api_credentials.yaml"
-
 prometheus:
   enabled: true
   level: full
@@ -216,7 +210,7 @@ EOH
       }
 
       template {
-        destination = "/local/crowdsec/acquis.yaml"
+        destination = "/local/crowdsec/acquis.d/appsec.yaml"
         data = <<EOH
 # appsec
 listen_addr: 127.0.0.1:7422
@@ -225,16 +219,18 @@ name: AppSecComponent
 source: appsec
 labels:
   type: appsec
+EOH
+      }
 
----
-
+      template {
+        destination = "/local/crowdsec/acquis.d/traefik.yaml"
+        data = <<EOH
 # Traefik
 poll_without_inotify: false
 filenames:
   - {{ env "NOMAD_ALLOC_DIR" }}/traefik/*.log # Traefik access log location
 labels:
   type: traefik
-
 EOH
       }
 
