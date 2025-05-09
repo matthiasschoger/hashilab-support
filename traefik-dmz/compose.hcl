@@ -171,7 +171,7 @@ EOH
         COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-crs"
       }
 
-      template { # fetch login information from container after executing "clcli enroll"
+      template { # fetch login information from container after executing "cscli enroll" and before restart
         destination = "secrets/crowdsec/online_api_credentials.yaml"
         data = <<EOH
 url: https://api.crowdsec.net/
