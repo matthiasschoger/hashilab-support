@@ -24,14 +24,22 @@ job "nightly-backups" {
 echo "backing up Nomad variables"
 nomad operator snapshot save /backup/raft-backup.$(date +"%Y%m%d%H%M").snap
 find /backup/* -mtime +3 -exec rm {} \;
+
 echo "backing up Unifi Network MongoDB"
 nomad action -job=unifi-network -group=mongodb -task=server backup-mongodb
+
 echo "backing up Bookstack MariaDB"
 nomad action -job=bookstack -group=mariadb -task=server backup-mariadb
+
+echo "backing up Firefly MariaDB"
+nomad action -job=firefly -group=mariadb -task=server backup-mariadb
+
 echo "backing up Immich Postgres DB"
 nomad action -job=immich -group=backend -task=postgres backup-postgres
+
 echo "backing up Traefik-DMZ Postgres DB"
 nomad action -job=traefik-dmz -group=postgres -task=server backup-postgres
+
 echo "finished running nightly backups"
 EOF
         ]
