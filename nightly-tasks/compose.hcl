@@ -1,4 +1,4 @@
-job "nightly-backups" {
+job "nightly-tasks" {
   datacenters = ["home"]
   type        = "batch"
 
@@ -13,7 +13,7 @@ job "nightly-backups" {
 
   group "nightly" {
 
-    task "backups" {
+    task "runner" {
       driver = "exec"
 
       config {
@@ -21,6 +21,9 @@ job "nightly-backups" {
         # command line arguments which call Nomad to execute the backup Action
         # add additional backup Actions as desired
         args    = ["-c", <<EOF
+echo "updating banking transactions in Firefly"
+nomad action -job=firefly -group=fints -task=inporter update-transactions
+
 echo "backing up Nomad variables"
 nomad operator snapshot save /backup/raft-backup.$(date +"%Y%m%d%H%M").snap
 find /backup/* -mtime +3 -exec rm {} \;
@@ -40,7 +43,7 @@ nomad action -job=immich -group=backend -task=postgres backup-postgres
 echo "backing up Traefik-DMZ Postgres DB"
 nomad action -job=traefik-dmz -group=postgres -task=server backup-postgres
 
-echo "finished running nightly backups"
+echo "finished running nightly tasks"
 EOF
         ]
       }
@@ -50,7 +53,7 @@ EOF
         destination = "secrets/variables.env"
         env             = true
         data            = <<EOH
-{{- with nomadVar "nomad/jobs/nightly-backups" }}
+{{- with nomadVar "nomad/jobs/nightly-tasks" }}
 NOMAD_TOKEN = "{{- .token }}"
 TZ = "Europe/Berlin"
 {{- end }}
