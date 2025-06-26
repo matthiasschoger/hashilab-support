@@ -11,16 +11,14 @@ capability {
 
 context {
   server = "storage.home"
-  share = "/volume1/homelab-hdd"
+  share = "/volume2/homelab"
   subDir = "prometheus"
-  mountPermissions = "755"  
 }
 
 mount_options {
   fs_type = "nfs"
   
   # FIXME: might need specific NFS options
-  
   mount_flags = [ "timeo=30", "vers=4.1", "nolock" ]
 }
 
