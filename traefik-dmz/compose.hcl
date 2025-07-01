@@ -332,7 +332,8 @@ EOF
       }
 
       config {
-         image = "postgres:15"
+        image = "postgres:15"
+        force_pull = true
 
         volumes = [
           "secrets/initdb:/docker-entrypoint-initdb.d:ro",
