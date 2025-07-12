@@ -24,6 +24,7 @@ To keep the jobs manageable, I've split them into three repositories
 The "support" repository defines mostly operational stuff which makes it easier to manage the cluster and collect metrics about the inner workings of the whole setup. In addition, it exposes some services on the internet via Cloudflare Tunnel.
 
 - cloudflared - Cloudflare tunnel which exposes some services on the internet. 
+- traefik-dmz: Reverse proxy which picks up configurations from service annotations and routes the traffic to those services. Receives the traffic from cloudflared, checks for suspect patterns with crowdsec and finally routes the traffic to the exposed services in my DMZ.
 - diun - Update notifications when new releases are available for my services.
 - log-collection - Log file aggregation of all servers into Loki.
 - loki - Central log file aggregation.
