@@ -56,6 +56,7 @@ scrape_configs:
     static_configs:
       - targets:
           - 'storage.home:9100'
+          - 'proxmox0.home:9100'
           - 'proxmox1.home:9100'
           - 'proxmox2.home:9100'
     relabel_configs:
