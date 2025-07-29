@@ -50,7 +50,7 @@ job "prometheus" {
         sidecar_task {
           resources {
             cpu    = 50
-            memory = 64
+            memory = 32
           }
         }
       }
@@ -91,7 +91,7 @@ job "prometheus" {
         sidecar_task {
           resources {
             cpu    = 50
-            memory = 64
+            memory = 32
           }
         }
       }
@@ -122,8 +122,8 @@ job "prometheus" {
       }
 
       resources {
-        cpu    = 3000
-        memory = 1536
+        cpu    = 1500
+        memory = 768
       }
 
       volume_mount {
@@ -147,7 +147,7 @@ job "prometheus" {
 
       resources {
         cpu    = 50
-        memory = 32
+        memory = 24
       }
     }    
 
@@ -176,7 +176,7 @@ job "prometheus" {
 
       resources {
         cpu    = 50
-        memory = 32
+        memory = 16
       }
     }
   
