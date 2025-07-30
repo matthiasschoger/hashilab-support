@@ -151,10 +151,8 @@ job "prometheus" {
       }
     }    
 
-    ### Exporters
-
     # snmp exporter for the Synology metrics
-    task "snmp-exporter" {
+    task "synology-exporter" {
       driver = "docker"
 
       config {
