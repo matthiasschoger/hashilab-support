@@ -30,7 +30,7 @@ job "proton-bridge" {
         sidecar_task {
           resources {
             cpu    = 50
-            memory = 64
+            memory = 48
           }
         }
       }    
@@ -46,7 +46,7 @@ job "proton-bridge" {
       }
 
       resources {
-        memory = 128
+        memory = 384
         cpu    = 200
       }
 
