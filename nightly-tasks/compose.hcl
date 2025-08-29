@@ -23,7 +23,7 @@ job "nightly-tasks" {
         args    = ["-c", <<EOF
 echo "backing up Nomad variables"
 nomad operator snapshot save /backup/raft-backup.$(date +"%Y%m%d%H%M").snap
-find /backup/* -mtime +3 -exec rm {} \;
+find /backup -maxdepth 1 -type f -printf '%T@ %p\n' | sort -nr | tail -n +4 | cut -d' ' -f2- | xargs -r rm --
 
 echo "backing up Unifi Network MongoDB"
 nomad action -job=unifi-network -group=mongodb -task=server backup-mongodb
