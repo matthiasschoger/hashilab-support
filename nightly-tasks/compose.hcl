@@ -21,9 +21,6 @@ job "nightly-tasks" {
         # command line arguments which call Nomad to execute the backup Action
         # add additional backup Actions as desired
         args    = ["-c", <<EOF
-echo "updating banking transactions in Firefly"
-nomad action -job=firefly -group=fints -task=inporter update-transactions
-
 echo "backing up Nomad variables"
 nomad operator snapshot save /backup/raft-backup.$(date +"%Y%m%d%H%M").snap
 find /backup/* -mtime +3 -exec rm {} \;
@@ -33,9 +30,6 @@ nomad action -job=unifi-network -group=mongodb -task=server backup-mongodb
 
 echo "backing up Bookstack MariaDB"
 nomad action -job=bookstack -group=mariadb -task=server backup-mariadb
-
-echo "backing up Firefly MariaDB"
-nomad action -job=firefly -group=mariadb -task=server backup-mariadb
 
 echo "backing up Immich Postgres DB"
 nomad action -job=immich -group=backend -task=postgres backup-postgres
