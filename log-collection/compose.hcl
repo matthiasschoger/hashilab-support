@@ -3,7 +3,7 @@ variable "base_domain" {
 }
 
 job "log-collection" {
-  datacenters = ["arbiter", "home", "dmz", "nixos"]
+  datacenters = ["arbiter", "home", "dmz"]
   type        = "system"
 
   group "promtail" {
