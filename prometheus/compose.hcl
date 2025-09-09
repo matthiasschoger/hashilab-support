@@ -91,7 +91,7 @@ job "prometheus" {
         sidecar_task {
           resources {
             cpu    = 50
-            memory = 32
+            memory = 48
           }
         }
       }
@@ -174,7 +174,7 @@ job "prometheus" {
 
       resources {
         cpu    = 50
-        memory = 16
+        memory = 24
       }
     }
   

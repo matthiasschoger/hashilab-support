@@ -169,6 +169,7 @@ EOH
         TZ = "Europe/Berlin"
 
         COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-crs"
+        CROWDSEC_BYPASS_DB_VOLUME_CHECK = true
       }
 
       template { # fetch login information from container after executing "cscli enroll" and before restart

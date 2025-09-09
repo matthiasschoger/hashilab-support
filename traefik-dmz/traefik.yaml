@@ -26,7 +26,7 @@ entryPoints:
     http:
       middlewares:
         - cloudflarewarp@file # will rewrite the ClientHost field in the access log with the real IP of the client
-        - crowdsec@file       # crowdsec bouncer
+#        - crowdsec@file       # crowdsec bouncer
     forwardedHeaders:
       trustedIPs:
         - 127.0.0.1/32 # localhost because of Consul Connect SDN
