@@ -98,11 +98,9 @@ job "prometheus" {
     }
 
     task "server" {
-
-      driver = "docker"
-
       user = "1026:100" # matthias:users
 
+      driver = "docker"
       config {
         image = "prom/prometheus:latest"
 
@@ -135,8 +133,12 @@ job "prometheus" {
     # Push gateway, see https://github.com/sa06/prometheus-pushgateway/blob/master/README.md
     #  currently used by crowdsec to push geocoded intrusion attempts
     task "push-gateway" {
+      lifecycle {
+        hook = "prestart"
+        sidecar = true
+      }
+      
       driver = "docker"
-
       config {
         image = "prom/pushgateway:latest"
       }
@@ -153,8 +155,12 @@ job "prometheus" {
 
     # snmp exporter for the Synology metrics
     task "synology-exporter" {
-      driver = "docker"
+      lifecycle {
+        hook = "prestart"
+        sidecar = true
+      }
 
+      driver = "docker"
       config {
         image = "prom/snmp-exporter:latest"
 
