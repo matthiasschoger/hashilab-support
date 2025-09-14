@@ -19,3 +19,4 @@ http:
           crowdsecLapiHost: localhost:8080
           crowdsecLapiScheme: http
           crowdsecLapiTLSInsecureVerify: false
+          crowdsecAppsecBodyLimit: 115343360 # 110MB

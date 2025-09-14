@@ -29,6 +29,7 @@ job "traefik-dmz" {
     service {
       name = "traefik-dmz-api"
 
+      task = "server"
       port = 1080
 
       check {
@@ -100,6 +101,27 @@ job "traefik-dmz" {
       }
     }
 
+    service {
+      name = "traefik-crowdsec-lapi"
+
+      task = "server"
+      port = 8080
+
+      check {
+        type     = "http"
+        path     = "/health"
+        interval = "5s"
+        timeout  = "2s"
+        expose   = true # required for Connect
+      }
+
+      connect {
+        sidecar_service {
+          proxy { }
+        }
+      }
+    }
+
     task "server" {
 
       driver = "docker"
@@ -144,8 +166,8 @@ EOH
       }
 
       resources {
-        memory = 384
-        cpu    = 400
+        memory = 256
+        cpu    = 200
       }
     }
   
@@ -188,21 +210,16 @@ EOH
         data = <<EOH
 common:
   # log_level: debug
-  log_level: info
-db_config:
-  type:    postgresql
-  db_name: crowdsec  
-  user:    crowdsec
-{{- with nomadVar "nomad/jobs/traefik-dmz" }}
-  password: "{{- .crowdsec_postgres_pass }}"
-{{- end }}
-  host:    localhost
-  port:    5432
-  sslmode: disable
+  # log_level: error
 api:
   server:
     online_client:
       credentials_path: "/secrets/crowdsec/online_api_credentials.yaml"
+config_paths:
+  # preserve stuff downloaded from Crowdsec Central between updates
+  hub_dir: /alloc/data/crowdsec/hub
+db_config:
+  use_wal: true
 prometheus:
   enabled: true
   level: full
@@ -235,6 +252,7 @@ labels:
 EOH
       }
 
+      # FIXME: still experimental, does not work yet
       template { # http notification, which pushes lapi decisions to the Prometheus push endpoint
         destination = "/local/crowdsec/notifications/http.yaml"
         left_delimiter  = "[["
@@ -263,127 +281,20 @@ headers:
 EOH
       }
 
+      volume_mount {
+        volume      = "crowdsec"
+        destination = "/var/lib/crowdsec/data"
+      }
+
       resources {
         memory = 256
-        cpu    = 600
-      }
-    }
-  }
-
-# --- Postgres database ---
-
-  group "postgres" {
-
-    network {
-      mode = "bridge"
-
-      port "envoy_metrics" { to = 9101 }
-    }
-
-    service {
-      name = "traefik-crowdsec-postgres"
-
-      port = 5432
-
-      check {
-        type     = "script"
-        task = "server"
-        command  = "sh"
-        args     = ["-c", "psql -U $POSTGRES_USER -d crowdsec  -c 'SELECT 1' || exit 1"]
-        interval = "10s"
-        timeout  = "2s"
-      }
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9101"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 50
-          }
-        }
+        cpu    = 300
       }
     }
 
-    task "server" {
-      driver = "docker"
-
-      # proper user id is required 
-      user = "1026:100" # matthias:users
-
-      # backs up the Postgres database and removes all files in the backup folder which are older than 3 days.
-      action "backup-postgres" {
-        command = "/bin/sh"
-        args    = ["-c", <<EOF
-pg_dumpall -U $POSTGRES_USER | gzip --rsyncable > /var/lib/postgresql/data/backup/backup.$(date +"%Y%m%d%H%M").sql.gz
-echo "cleaning up backup files older than 3 days ..."
-find /var/lib/postgresql/data/backup/ -maxdepth 1 -type f -printf '%T@ %p\n' | sort -nr | tail -n +4 | cut -d' ' -f2- | xargs -r rm --
-EOF
-        ]
-      }
-
-      config {
-        image = "postgres:15"
-        force_pull = true
-
-        volumes = [
-          "secrets/initdb:/docker-entrypoint-initdb.d:ro",
-        ]      
-      }
-
-      env {
-        TZ = "Europe/Berlin"
-      }
-
-      template {
-        destination = "secrets/variables.env"
-        env         = true
-        perms       = 400
-        data        = <<EOH
-{{- with nomadVar "nomad/jobs/traefik-dmz" }}
-POSTGRES_PASSWORD = {{- .crowdsec_postgres_pass }}
-POSTGRES_USER     = "crowdsec"
-DB_URL            = postgres://crowdsec:{{- .crowdsec_postgres_pass }}@127.0.0.1:5432/crowdsec
-{{- end }}
-EOH
-      }
-
-      template {
-        destination = "secrets/initdb/init-postgres.sql"
-        data = <<EOH
-{{- with nomadVar "nomad/jobs/traefik-dmz" }}
-CREATE DATABASE crowdsec;
-CREATE USER crowdsec WITH PASSWORD '{{- .crowdsec_postgres_pass }}';
-ALTER SCHEMA public owner to crowdsec;
-GRANT ALL PRIVILEGES ON DATABASE crowdsec TO crowdsec;
-{{- end }}
-EOH
-      }
-
-      volume_mount {
-        volume      = "crowdsec-postgres"
-        destination = "/var/lib/postgresql/data"
-      }
-
-      resources {
-        cpu    = 200
-        memory = 128
-      }
-    }
- 
-    volume "crowdsec-postgres" {
+    volume "crowdsec" {
       type            = "csi"
-      source          = "crowdsec-postgres"
+      source          = "crowdsec"
       access_mode     = "single-node-writer"
       attachment_mode = "file-system"
     }

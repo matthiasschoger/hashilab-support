@@ -15,7 +15,7 @@ experimental:
   plugins:
     bouncer:
       moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
-      version: v1.3.5
+      version: v1.4.5
     cloudflarewarp:
       modulename: github.com/BetterCorp/cloudflarewarp
       version: v1.3.3
@@ -26,7 +26,7 @@ entryPoints:
     http:
       middlewares:
         - cloudflarewarp@file # will rewrite the ClientHost field in the access log with the real IP of the client
-#        - crowdsec@file       # crowdsec bouncer
+        - crowdsec@file       # crowdsec bouncer
     forwardedHeaders:
       trustedIPs:
         - 127.0.0.1/32 # localhost because of Consul Connect SDN
