@@ -1,0 +1,24 @@
+http:
+  middlewares:
+    secureHeaders:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        frameDeny: true
+        customFrameOptionsValue: "SAMEORIGIN"
+        referrerPolicy: "same-origin"
+
+        contentSecurityPolicy: >-
+          default-src 'self' ;
+          script-src * 'unsafe-inline' 'unsafe-eval' data: blob: ;
+          connect-src * ;
+          img-src * data: blob: ;
+          object-src * ;
+          style-src 'self' 'unsafe-inline' ;
+          form-action 'self' ;
+          base-uri 'self';
+          frame-ancestors 'none' ;
+
+        customResponseHeaders:
+          server: ""
+          x-powered-by: ""
