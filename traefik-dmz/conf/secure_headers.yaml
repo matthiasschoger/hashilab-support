@@ -8,6 +8,8 @@ http:
         customFrameOptionsValue: "SAMEORIGIN"
         referrerPolicy: "same-origin"
 
+        # HSTS is handles by CloudFlare
+
         contentSecurityPolicy: >-
           default-src 'self' ;
           script-src * 'unsafe-inline' 'unsafe-eval' data: blob: ;
