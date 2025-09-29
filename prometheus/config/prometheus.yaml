@@ -114,6 +114,21 @@ scrape_configs:
         replacement: localhost:9116
         target_label: __address__
 
+  - job_name: hass
+    metrics_path: /api/prometheus
+{{- with nomadVar "nomad/jobs/prometheus" }}
+    # Long-Lived Access Token
+    bearer_token: "{{ .hass_token }}"
+{{- end }}
+    static_configs:
+    - targets:
+      - home-assistant.service.consul:8123
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
+
   - job_name: node-exporter-consul
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
