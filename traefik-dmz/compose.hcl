@@ -17,7 +17,7 @@ job "traefik-dmz" {
 
       port "envoy_metrics_dmz_api" { to = 9102 }
       port "envoy_metrics_dmz_http" { to = 9103 }
-      port "envoy_metrics_crowdsec_api" { to = 9104 }
+      port "envoy_metrics_crowdsec_lapi" { to = 9104 }
     }
 
     ephemeral_disk {
@@ -41,8 +41,8 @@ job "traefik-dmz" {
       }
 
       meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_dmz_api}" # make envoy metrics port available in Consul
         metrics_port = "${NOMAD_HOST_PORT_metrics}"
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_dmz_api}" # make envoy metrics port available in Consul
         crowdsec_metrics_port = "${NOMAD_HOST_PORT_crowdsec_metrics}"
       }
       connect {
@@ -50,10 +50,6 @@ job "traefik-dmz" {
           proxy {
             config {
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
-            }
-            upstreams { 
-                destination_name = "traefik-crowdsec-postgres"
-                local_bind_port  = 5432
             }
           }
         }
@@ -115,9 +111,16 @@ job "traefik-dmz" {
         expose   = true # required for Connect
       }
 
+      meta {
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_crowdsec_lapi}" # make envoy metrics port available in Consul
+      }
       connect {
         sidecar_service {
-          proxy { }
+          proxy { 
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9104"
+            }
+          }
         }
       }
     }
@@ -177,6 +180,11 @@ EOH
 
       driver = "docker"
 
+      lifecycle {
+        hook = "prestart"
+        sidecar = true
+      }
+      
       config {
         image = "crowdsecurity/crowdsec:latest"
 
@@ -218,8 +226,8 @@ api:
 config_paths:
   # preserve stuff downloaded from Crowdsec Central between updates
   hub_dir: /alloc/data/crowdsec/hub
-db_config:
-  use_wal: true
+#db_config:
+#  use_wal: true
 prometheus:
   enabled: true
   level: full
