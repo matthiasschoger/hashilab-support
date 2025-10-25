@@ -31,6 +31,7 @@ job "node-exporter" {
           "--path.rootfs=/hostfs",
           "--path.procfs=/host/proc",
           "--path.sysfs=/host/sys",
+          "--path.udev.data=/hostfs/run/udev/data",
           "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|run|hostfs/var/lib/docker|hostfs/var/lib/containerd)($|/)", # ignore docker mounts
           "--collector.mountstats", # required to collect traffic stats for NFS mounts
         ]
