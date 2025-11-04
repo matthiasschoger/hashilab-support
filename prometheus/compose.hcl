@@ -120,7 +120,7 @@ job "prometheus" {
       }
 
       resources {
-        cpu    = 1500
+        cpu    = 3000
         memory = 768
       }
 
@@ -148,7 +148,7 @@ job "prometheus" {
       }
 
       resources {
-        cpu    = 50
+        cpu    = 200
         memory = 48
       }
     }    
@@ -179,7 +179,7 @@ job "prometheus" {
       }
 
       resources {
-        cpu    = 50
+        cpu    = 100
         memory = 24
       }
     }

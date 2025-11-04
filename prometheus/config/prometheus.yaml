@@ -96,7 +96,7 @@ scrape_configs:
       replacement: ${1}
       target_label: instance
 
-  - job_name: snmp # https://mariushosting.com/monitor-your-synology-with-grafana-and-prometheus-dashboard/
+  - job_name: synology # https://mariushosting.com/monitor-your-synology-with-grafana-and-prometheus-dashboard/
     static_configs:
       - targets: 
           - 'storage.home'
@@ -114,7 +114,7 @@ scrape_configs:
         replacement: localhost:9116
         target_label: __address__
 
-  - job_name: hass
+  - job_name: home-assistant
     metrics_path: /api/prometheus
 {{- with nomadVar "nomad/jobs/prometheus" }}
     # Long-Lived Access Token
