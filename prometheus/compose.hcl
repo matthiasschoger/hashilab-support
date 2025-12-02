@@ -106,6 +106,8 @@ job "prometheus" {
 
         args = [
                 "--config.file", "/local/prometheus/prometheus.yaml",
+                "--web.enable-otlp-receiver",
+                "--enable-feature=promql-experimental-functions",
                 "--log.level", "warn"
                ]
       }

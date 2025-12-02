@@ -4,6 +4,22 @@ global:
   evaluation_interval: 1m # Evaluate rules every 15 seconds. The default is every 1 minute.
   # scrape_timeout is set to the global default (10s).
 
+storage:
+  tsdb:
+    out_of_order_time_window: 30m # recommeded for OTel
+
+otlp:
+  # Recommended attributes to be promoted to labels.
+  promote_resource_attributes:
+    - service.instance.id
+    - service.name
+    - service.namespace
+    - service.version
+    - cloud.region
+    - container.name
+  keep_identifying_resource_attributes: true
+  translation_strategy: NoTranslation
+
 # Alertmanager configuration
 alerting:
   alertmanagers:
