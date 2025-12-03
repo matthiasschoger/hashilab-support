@@ -18,7 +18,6 @@ otlp:
     - cloud.region
     - container.name
   keep_identifying_resource_attributes: true
-  translation_strategy: NoTranslation
 
 # Alertmanager configuration
 alerting:
