@@ -60,8 +60,7 @@ job "loki" {
       user = "1026:100" # matthias:users
 
       config {
-        image = "grafana/loki:3.5.8"
-#        image = "grafana/loki:latest"
+        image = "grafana/loki:latest"
 
         args = [
           "-config.file=/local/config.yml",
