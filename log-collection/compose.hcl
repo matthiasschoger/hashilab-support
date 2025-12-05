@@ -48,7 +48,8 @@ job "log-collection" {
       driver = "docker"
 
       config {
-        image = "grafana/promtail:latest"
+#        image = "grafana/promtail:latest"
+        image = "grafana/promtail:3.5.8"
 
         args = ["--config.file", "/local/promtail.yaml"]
 
