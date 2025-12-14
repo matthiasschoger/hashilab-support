@@ -17,7 +17,6 @@ job "traefik-dmz" {
 
       port "envoy_metrics_dmz_api" { to = 9102 }
       port "envoy_metrics_dmz_http" { to = 9103 }
-      port "envoy_metrics_crowdsec_lapi" { to = 9104 }
     }
 
     ephemeral_disk {
@@ -92,34 +91,6 @@ job "traefik-dmz" {
           resources {
             cpu    = 50
             memory = 48
-          }
-        }
-      }
-    }
-
-    service {
-      name = "traefik-crowdsec-lapi"
-
-      task = "server"
-      port = 8080
-
-      check {
-        type     = "http"
-        path     = "/health"
-        interval = "5s"
-        timeout  = "2s"
-        expose   = true # required for Connect
-      }
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_crowdsec_lapi}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy { 
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9104"
-            }
           }
         }
       }
