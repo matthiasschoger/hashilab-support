@@ -14,6 +14,13 @@ job "pocket-id" {
       port "envoy_metrics" { to = 9102 }
     }
 
+    ephemeral_disk {
+      # Used to store GeoLite2-City geo-location database
+      # Nomad will try to preserve the disk between job updates
+      size    = 300 # MB
+      migrate = true
+    }
+
     service {
         name = "pocket-id"
 
@@ -81,11 +88,17 @@ APP_URL=https://pocket-id.${var.base_domain}
 
 {{- with nomadVar "nomad/jobs/pocket-id" }}
 ENCRYPTION_KEY="{{- .encryption_key }}"
-{{- end }}
 
 # These variables are optional but recommended to review:
 TRUST_PROXY=true
-MAXMIND_LICENSE_KEY=
+MAXMIND_LICENSE_KEY={{- .maxmind_key }}
+
+GEOLITE_DB_PATH="/alloc/data/geolite"
+{{- end }}
+
+METRICS_ENABLED=true
+OTEL_EXPORTER_OTLP_ENDPOINT="https://prometheus.lab.${var.base_domain}/api/v1/otlp"
+
 PUID=1026
 PGID=100
 EOH
