@@ -93,7 +93,7 @@ ENCRYPTION_KEY="{{- .encryption_key }}"
 TRUST_PROXY=true
 MAXMIND_LICENSE_KEY={{- .maxmind_key }}
 
-GEOLITE_DB_PATH="/alloc/data/geolite"
+GEOLITE_DB_PATH="/alloc/data/GeoLite2-City.db"
 {{- end }}
 
 METRICS_ENABLED=true
