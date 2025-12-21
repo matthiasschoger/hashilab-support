@@ -29,7 +29,7 @@ job "pocket-id" {
         tags = [
           "dmz.enable=true",
           "dmz.consulcatalog.connect=true",
-          "dmz.http.routers.pocket-id.rule=Host(`pocket-id.${var.base_domain}`)",
+          "dmz.http.routers.pocket-id.rule=Host(`oidc.${var.base_domain}`)",
           "dmz.http.routers.pocket-id.entrypoints=cloudflare"
         ]
 
@@ -84,7 +84,7 @@ job "pocket-id" {
 # See the documentation for more information: https://pocket-id.org/docs/configuration/environment-variables
 
 # These variables must be configured for your deployment:
-APP_URL=https://pocket-id.${var.base_domain}
+APP_URL=https://oidc.${var.base_domain}
 
 {{- with nomadVar "nomad/jobs/pocket-id" }}
 ENCRYPTION_KEY="{{- .encryption_key }}"
