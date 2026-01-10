@@ -29,8 +29,7 @@ job "pocket-id" {
         tags = [
           "dmz.enable=true",
           "dmz.consulcatalog.connect=true",
-          "dmz.http.routers.pocket-id.rule=Host(`oidc.${var.base_domain}`)",
-          "dmz.http.routers.pocket-id.entrypoints=cloudflare"
+          "dmz.http.routers.pocket-id.rule=Host(`oidc.${var.base_domain}`)"
         ]
 
         check {
@@ -91,13 +90,13 @@ ENCRYPTION_KEY="{{- .encryption_key }}"
 
 # These variables are optional but recommended to review:
 TRUST_PROXY=true
-MAXMIND_LICENSE_KEY={{- .maxmind_key }}
 
+MAXMIND_LICENSE_KEY={{- .maxmind_key }}
 GEOLITE_DB_PATH="/alloc/data/GeoLite2-City.db"
 {{- end }}
 
-METRICS_ENABLED=true
-OTEL_EXPORTER_OTLP_ENDPOINT="https://prometheus.lab.${var.base_domain}/api/v1/otlp"
+#METRICS_ENABLED=true
+#OTEL_EXPORTER_OTLP_ENDPOINT="https://prometheus.lab.${var.base_domain}/api/v1/otlp"
 
 PUID=1026
 PGID=100
@@ -110,7 +109,7 @@ EOH
       }
 
       resources {
-        memory = 128
+        memory = 64
         cpu    = 50
       }
     }

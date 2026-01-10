@@ -23,6 +23,7 @@ experimental:
 entryPoints:
   cloudflare:
     address: :80
+    asDefault: true 
     http:
       middlewares:
         - cloudflarewarp@file # will rewrite the ClientHost field in the access log with the real IP of the client
