@@ -64,8 +64,7 @@ job "traefik-dmz" {
       tags = [ # registers the DMZ Traefik instance with the home instance
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.traefik-dmz.rule=Host(`dmz.lab.${var.base_domain}`)",
-        "traefik.http.routers.traefik-dmz.entrypoints=websecure"
+        "traefik.http.routers.traefik-dmz.rule=Host(`dmz.lab.${var.base_domain}`)"
       ]
     }
 

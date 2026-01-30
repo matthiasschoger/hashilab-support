@@ -31,8 +31,7 @@ job "prometheus" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.prometheus.rule=Host(`prometheus.lab.${var.base_domain}`)",
-        "traefik.http.routers.prometheus.entrypoints=websecure"
+        "traefik.http.routers.prometheus.rule=Host(`prometheus.lab.${var.base_domain}`)"
       ]
 
       meta {
