@@ -60,6 +60,9 @@ job "cloudflare-dyndns" {
         env = true
         data = <<EOH
 {{- with nomadVar "nomad/jobs/cloudflare-dyndns" }}
+DYNDNS_SERVER_USERNAME = "updater"
+DYNDNS_SERVER_PASSWORD = "{{- .updater_pw }}"
+
 CLOUDFLARE_API_EMAIL  = "{{- .email }}"
 CLOUDFLARE_API_TOKEN  = "{{- .token }}"
 CLOUDFLARE_ZONES_IPV4 = "{{- .zone }}"
