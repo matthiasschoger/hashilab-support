@@ -23,9 +23,9 @@ job "diun" {
 #                "--log-level", "debug"
         ]
 
-        volumes = [
-          "/etc/ssl/certs:/etc/ssl/certs:ro"    # use TLS certs from host OS, required to talk to Node Red via Traefik (TLS)
-        ]      
+        # volumes = [
+        #   "/etc/ssl/certs:/etc/ssl/certs:ro"    # use TLS certs from host OS, required to talk to Node Red via Traefik (TLS)
+        # ]      
       }
 
       env = {
@@ -76,7 +76,7 @@ notif:
     templateTitle: 'Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}'
 
   webhook:
-    endpoint: https://node-red.lab.${var.base_domain}/homelab/diun
+    endpoint: https://n8n.lab.${var.base_domain}/webhook/homelab/diun    
     method: POST
 
 

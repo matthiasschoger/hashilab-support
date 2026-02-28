@@ -283,3 +283,18 @@ scrape_configs:
       regex: ([^:]+):.*
       replacement: ${1}
       target_label: instance
+
+
+  - job_name: 'n8n'
+    consul_sd_configs:
+      - server: 'consul.service.consul:8500'
+        services: ['n8n']
+    relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
