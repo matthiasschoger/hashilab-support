@@ -288,7 +288,7 @@ scrape_configs:
   - job_name: 'n8n'
     consul_sd_configs:
       - server: 'consul.service.consul:8500'
-        services: ['n8n']
+        services: ['n8n-api']
     relabel_configs:
     - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
       regex: ([^:]+)(?::\d+)?;(\d+)
