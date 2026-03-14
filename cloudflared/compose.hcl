@@ -13,7 +13,18 @@ job "cloudflared" {
 
     service {
         name = "ingress-cloudflare"
-        
+
+        port = "9100" # metrics port provides readiness endpoint
+
+        check {
+          name     = "cloudflared-tunnel"
+          type     = "http"
+          path     = "/ready"
+          interval = "10s"
+          timeout  = "3s"
+          expose   = true # required for Connect
+        }
+
         meta {
             envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
             metrics_port = "${NOMAD_HOST_PORT_metrics}"
@@ -56,16 +67,18 @@ job "cloudflared" {
         ports = ["metrics"]
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       template {
         destination = "secrets/config.yaml"
         data = <<EOH
 {{- with nomadVar "nomad/jobs/cloudflared" }}
-
 tunnel: {{ .tunnel }}
 token: {{ .token }}
 
 metrics: 0.0.0.0:9100
-
 {{- end }}
 EOH
       }
