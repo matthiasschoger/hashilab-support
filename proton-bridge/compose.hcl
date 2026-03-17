@@ -43,7 +43,8 @@ job "proton-bridge" {
 
       config {
         image = "shenxn/protonmail-bridge:latest"
-      }
+        command = "apt-get update && apt-get install -y libfido2-dev libcbor-dev libfido2-1 && bash /protonmail/entrypoint.sh"
+       }
 
       resources {
         memory = 384

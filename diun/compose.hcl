@@ -65,13 +65,15 @@ watch:
 
 notif:
   mail:
-    host: smtp.lab.${var.base_domain}
+    host: smtp.protonmail.ch
+    port: 587
+    ssl: true
+    insecureSkipVerify: false
 [[- with nomadVar "nomad/jobs/diun" ]]
     username: "[[ .email_user ]]"
     password: "[[ .email_pass ]]"
     from: "[[ .email_user ]]"
     to: "[[ .email_receipient ]]"
-    insecureSkipVerify: true
 [[- end ]]
     templateTitle: 'Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}'
 
