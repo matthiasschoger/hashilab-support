@@ -67,7 +67,6 @@ notif:
   mail:
     host: smtp.protonmail.ch
     port: 587
-    ssl: true
     insecureSkipVerify: false
 [[- with nomadVar "nomad/jobs/diun" ]]
     username: "[[ .email_user ]]"
