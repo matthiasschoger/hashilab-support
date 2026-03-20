@@ -15,34 +15,44 @@ job "log-collection" {
     }
 
     # TODO: rework to send the logs via the Consul Connect SDN
-    # service {
-    #   name = "promtail"
+    service {
+      name = "promtail"
 
-    #   meta {
-    #     envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
-    #   }
-    #   connect {
-    #     sidecar_service {
-    #       proxy {
-    #         config {
-    #           envoy_prometheus_bind_addr = "0.0.0.0:9102"
-    #         }
+      port = 9080
 
-    #         upstreams {
-    #             destination_name = "loki"
-    #             local_bind_port  = 3100
-    #         }
-    #       }
-    #     }
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
+        expose   = true # required for Connect
+      }
 
-    #     sidecar_task {
-    #       resources {
-    #         cpu    = 50
-    #         memory = 48
-    #       }
-    #     }
-    #   }
-    # }
+      meta {
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
+      }
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9102"
+            }
+
+            # upstreams {
+            #     destination_name = "loki"
+            #     local_bind_port  = 3100
+            # }
+          }
+        }
+
+        sidecar_task {
+          resources {
+            cpu    = 50
+            memory = 48
+          }
+        }
+      }
+    }
 
     task "promtail" {
       driver = "docker"
