@@ -22,16 +22,12 @@ job "diun" {
                 "--config", "/secrets/diun.yaml", 
 #                "--log-level", "debug"
         ]
-
-        # volumes = [
-        #   "/etc/ssl/certs:/etc/ssl/certs:ro"    # use TLS certs from host OS, required to talk to Node Red via Traefik (TLS)
-        # ]      
       }
 
       env = {
         "TZ" = "Europe/Berlin"
 
-        "DIUN_DB_PATH" = "${NOMAD_ALLOC_DIR}/data/diun.db" # remove as soon as configuration via yaml is possible
+        "DIUN_DB_PATH" = "${NOMAD_ALLOC_DIR}/data/diun.db" # remove as soon as configuration via yaml is actually working
       }
 
       resources {
@@ -72,7 +68,7 @@ notif:
     username: "[[ .email_user ]]"
     password: "[[ .email_pass ]]"
     from: "[[ .email_user ]]"
-    to: "[[ .email_receipient ]]"
+    to: "Diun Updates <[[ .email_receipient ]]>"
 [[- end ]]
     templateTitle: 'Diun notification: {{ .Entry.Image }} {{ if (eq .Entry.Status "new") }}is available{{ else }}has been updated{{ end }}'
 

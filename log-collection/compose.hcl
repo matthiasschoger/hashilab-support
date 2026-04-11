@@ -6,265 +6,141 @@ job "log-collection" {
   datacenters = ["arbiter", "home", "dmz"]
   type        = "system"
 
-  group "promtail" {
+  group "alloy" {
 
     network {
       mode = "bridge"
 
-      port "envoy_metrics" { to = 9102 }
+      port "health" { to = 9080 }
     }
 
-    # TODO: rework to send the logs via the Consul Connect SDN
-    service {
-      name = "promtail"
+    ephemeral_disk {
+      migrate = true
+    }
 
-      port = 9080
+    service {
+      name = "alloy"
+
+      port = "health"
 
       check {
         type     = "http"
-        path     = "/ready"
+        path     = "/-/ready"
         interval = "10s"
         timeout  = "2s"
-        expose   = true # required for Connect
-      }
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9102"
-            }
-
-            # upstreams {
-            #     destination_name = "loki"
-            #     local_bind_port  = 3100
-            # }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 48
-          }
-        }
       }
     }
 
-    task "promtail" {
+    task "server" {
       driver = "docker"
 
       config {
-#        image = "grafana/promtail:latest"
-        image = "grafana/promtail:3.5.8"
+        image   = "grafana/alloy:latest"
 
-        args = ["--config.file", "/local/promtail.yaml"]
+        args = [
+          "run",
+          "--server.http.listen-addr=0.0.0.0:9080",
+          "--storage.path=${NOMAD_ALLOC_DIR}/data",  # important to persist the current position over container re-deployments
+          "/local/config.alloy"
+        ]
 
         volumes = [
-          "/var/log:/host/var/log:ro",
+          "/var/run/docker.sock:/var/run/docker.sock",
+          "/opt/nomad/data/alloc:/alloy/nomad/alloc:ro"
         ]
+
+        privileged = true
       }
 
       env {
         TZ = "Europe/Berlin"
       }
 
-      resources {
-        memory = 128
-        cpu    = 50
-      }
-
+      # Alloy configuration in River/Alloy DSL
       template {
-        destination = "local/promtail.yaml"
-        data            = <<EOH
-server:
-  http_listen_port: 9080
-  grpc_listen_port: 0
+        destination = "local/config.alloy"
+        data        = <<EOT
+// ── 0. General configurations ──────────────────────────────
 
-positions:
-  filename: /tmp/positions.yaml
+logging {
+  level  = "info"
+  format = "logfmt"
+}
 
-clients:
-  - url: http://loki.lab.${var.base_domain}:3100/loki/api/v1/push
-#  - url: http://localhost:3100/loki/api/v1/push
+// ── 1. Discover all running Docker containers ──────────────────────────────
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
 
-scrape_configs:
-- job_name: systemd-journal
-  journal:
-    labels:
-      job: default/systemd-journal
-    path: /host/var/log/journal
-  relabel_configs:
-  - source_labels:
-    - __journal__systemd_unit
-    target_label: app
-  - source_labels:
-    - __journal__hostname
-    target_label: hostname
-  - source_labels:
-    - __journal_syslog_identifier
-    target_label: syslog_identifier
-EOH
-      }
-    }
+// ── 2. Relabel: extract Nomad metadata from Docker labels ──────────────────
+discovery.relabel "nomad_containers" {
+  targets = discovery.docker.containers.targets
+
+  // Map Nomad job metadata to log labels
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_job_name"]
+    target_label  = "application"
   }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_task_group_name"]
+    target_label  = "group"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_task_name"]
+    target_label  = "task"
+  }
+  rule {
+    source_labels = ["__meta_consul_service"]
+    target_label  = "servicename"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_node_name"]
+    regex = "(.*)"
+    replacement = "$1.home"
+    target_label  = "machine"
+  }
+}
 
-/*
-  # Vector group
-  group "vector" {
+// ── 3. Collect logs from Docker containers ─────────────────────────────────
+loki.source.docker "docker_logs" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.relabel.nomad_containers.output
+  relabel_rules = discovery.relabel.nomad_containers.rules
+  labels        = { "platform" = "nomad", "type" = "container" }
+ forward_to    = [loki.write.loki_backend.receiver]
+//  forward_to    = [loki.process.filter_old_docker_logs.receiver]
+}
 
-    network {
-      mode = "bridge"
+// ── 4. Also tail Nomad alloc logs directly from the filesystem ────────────
+local.file_match "alloc_logs" {
+  path_targets = [{
+    __path__ = "/alloy/nomad/alloc/**/alloc/logs/*.std*.[0-9]*",
+    __path_exclude__ = "/alloy/nomad/alloc/**/alloc/logs/{connect-,envoy_bootstrap}*",
+    platform  = "nomad",
+    source    = "alloc_logs",
+  }]
+}
 
-      port "envoy_metrics" { to = 9102 }
-    }
+loki.source.file "alloc_log_files" {
+  targets    = local.file_match.alloc_logs.targets
+  forward_to = [loki.write.loki_backend.receiver]
+  tail_from_end = true    // ← skips all pre-existing content on first start
+}
 
-    ephemeral_disk {
-      size    = 500
-      sticky  = true
-    }
+// ── 5. Write to Loki ───────────────────────────────────────────────────────
+loki.write "loki_backend" {
+  endpoint {
+    url = "http://loki.lab.${var.base_domain}:3100/loki/api/v1/push"
+  }
+}
 
-    service {
-      name = "vector"
-
-      port = 8686
-
-      check {
-        type     = "http"
-        path     = "/health"
-        interval = "30s"
-        timeout  = "5s"
-        expose   = true # required for Connect
-      }
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9102"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 48
-          }
-        }
-      }
-    }
-
-    task "vector" {
-      driver = "docker"
-
-      config {
-        image = "timberio/vector:latest-debian"
-
-        volumes = [
-          "/etc/machine-id:/etc/machine-id:ro" # required for Vector?
-        ]
-      }
-
-      env {
-        TZ     = "Europe/Berlin"
-        LC_ALL = "C.UTF-8" # required for UTF-8 support
-
-        VECTOR_CONFIG = "/local/vector.yaml"
+EOT
       }
 
       resources {
-        memory = 512
-        cpu    = 50
+        cpu    = 200
+        memory = 256
       }
-
-      template {
-        destination = "local/vector.yaml"
-        change_mode   = "signal"
-        change_signal = "SIGHUP"
-        # overriding the delimiters to [[ ]] to avoid conflicts with Vector's native templating, which also uses {{ }}
-        left_delimiter = "[["
-        right_delimiter = "]]"
-        data            = <<EOH
-data_dir: "alloc/data/vector/"
-api:
-  enabled: true
-healthchecks:
-  require_healthy: true
-
-sources:
-  docker_logs:
-    type: "docker_logs"
-
-transforms:
-  throttled_docker_logs:
-    type: "throttle"
-    inputs:
-      - "docker_logs"
-    threshold: 1
-    window_secs: 10
-  translormed_logs:
-    type: "remap"
-    inputs
-      -  "logs"
-    source: '''
-            .debug = parse_key_value!(.message)
-            .job_name = split(get!(value: .label, path: ["com.hashicorp.nomad.job_name"]), "/")[0] ?? get!(value: .label, path: ["com.hashicorp.nomad.job_name"])
-    '''
-sinks:
-  out:
-    type: "console"
-    inputs: 
-      - "docker_logs"
-    target: "stdout"
-    encoding:
-      codec: "json"
-  loki:
-    type: "loki"
-    endpoint: "http://lab.${var.base_domain}:3100"
-    healthcheck:
-      enabled: true
-    inputs: 
-#      - "throttled_docker_logs"
-      - "translormed_logs"
-    encoding:
-      codec: "json"
-    buffer
-      type: "memory"
-#    batch:
-#      max_bytes: 1000000
-#      max_events: 1
-    labels:
-      app: "containers"
-      # See https://vector.dev/docs/reference/vrl/expressions/#path-example-nested-path
-      job: "{{label.\"com.hashicorp.nomad.job_name\" }}"
-      task: "{{label.\"com.hashicorp.nomad.task_name\" }}"
-      group: "{{label.\"com.hashicorp.nomad.task_group_name\" }}"
-      node: "{{label.\"com.hashicorp.nomad.node_name\" }}"
-    remove_label_fields: true # remove fields that have been converted to labels to avoid having the field twice
-EOH
-      }
-
-      # docker socket volume mount
-      volume_mount {
-        volume = "docker-sock"
-        destination = "/var/run/docker.sock"
-        read_only = true
-      }
-    }
-
-    # docker socket volume
-    volume "docker-sock" {
-      type = "host"
-      source = "docker-sock-ro"
-      read_only = true
     }
   }
-*/
 }
