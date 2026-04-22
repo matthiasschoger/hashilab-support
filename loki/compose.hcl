@@ -14,10 +14,7 @@ job "loki" {
     network {
       mode = "bridge"
 
-      # port "rsyslog" { static = 514 }
-
       port "envoy_metrics_loki" { to = 9102 }
-#      port "envoy_metrics_syslog" { to = 9103 }
     }
 
     service {
@@ -73,8 +70,73 @@ job "loki" {
       }
 
       template {
-        data        = file("config.yml")
         destination = "local/config.yml"
+        data        = <<EOT
+auth_enabled: false
+
+server:
+  log_level: warn
+  http_listen_port: 3100
+
+common:
+  replication_factor: 1
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+  path_prefix: {{ env "NOMAD_ALLOC_DIR" }}/data/tmp
+
+ingester:
+  lifecycler:
+    address: 127.0.0.1
+    final_sleep: 0s
+  # Any chunk not receiving new logs in this time will be flushed
+  chunk_idle_period: 1h
+  # All chunks will be flushed when they hit this age, default is 1h
+  max_chunk_age: 1h
+  # Loki will attempt to build chunks up to 1.5MB, flushing if chunk_idle_period or max_chunk_age is reached first
+  chunk_target_size: 1048576
+  wal:
+    dir: {{ env "NOMAD_ALLOC_DIR" }}/data/wal
+    flush_on_shutdown: true
+    replay_memory_ceiling: "800M"
+
+compactor:
+  working_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-compactor
+
+schema_config:
+  configs:
+    - from: 2025-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: tsdb_index_
+        period: 24h
+
+storage_config:
+  filesystem:
+    directory: /loki/chunks
+  tsdb_shipper:
+    active_index_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-active
+    cache_location: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-cache
+    cache_ttl: 24h         # Can be increased for faster performance over longer query periods, uses more disk space
+
+limits_config:
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+
+chunk_store_config:
+#  max_look_back_period: 0s
+  chunk_cache_config:
+    embedded_cache:
+      enabled: true
+      max_size_mb: 1000
+      ttl: 24h
+
+query_range:
+  parallelise_shardable_queries: false # helps with "context canceled" messages I'm getting
+EOT
       }
 
       resources {
@@ -87,94 +149,7 @@ job "loki" {
         destination = "/loki"
       }    
     }
-/*
-    task "promtail" {
-      driver = "docker"
 
-      config {
-        image = "grafana/promtail:latest"
-
-        args = ["--config.file", "/local/promtail.yaml"]
-      }
-
-      env {
-        TZ = "Europe/Berlin"
-      }
-
-      template {
-        destination = "local/promtail.yaml"
-        data            = <<EOH
-server:  
-  http_listen_port: 9080  
-  grpc_listen_port: 0  
-positions:  
-  filename: /tmp/positions.yaml  
-clients:  
-  - url: http://localhost:3100/loki/api/v1/push 
-scrape_configs: 
-  - job_name: syslog 
-    syslog: 
-      listen_address: 0.0.0.0:1514 
-      labels: 
-        job: syslog 
-    relabel_configs: 
-      - source_labels: [__syslog_message_hostname] 
-        target_label: host 
-      - source_labels: [__syslog_message_hostname] 
-        target_label: hostname 
-      - source_labels: [__syslog_message_severity] 
-        target_label: level 
-      - source_labels: [__syslog_message_app_name] 
-        target_label: application 
-      - source_labels: [__syslog_message_facility] 
-        target_label: facility 
-      - source_labels: [__syslog_connection_hostname] 
-        target_label: connection_hostname
-EOH
-      }
-
-      resources {
-        memory = 96
-        cpu    = 50
-      }
-    }
-
-    task "rsyslog" {
-      driver = "docker"
-
-      config {
-        image = "linuxserver/syslog-ng:latest"
-      }
-
-      env {
-        TZ = "Europe/Berlin"
-      }
-
-      template {
-        destination = "/etc/syslog-ng/syslog-ng.conf"
-        data            = <<EOH
-source s_network {
-    default-network-drivers(
-    );
-};
-
-destination d_loki {
-    syslog("promtail" transport("tcp") port("1514"));
-};
-
-log {
-        source(s_network);
-        destination(d_loki);
-};
-EOH
-      }
-
-      resources {
-        memory = 96
-        cpu    = 50
-      }
-    }
-*/
     volume "loki" {
       type            = "csi"
       source          = "loki"
