@@ -60,21 +60,39 @@ job "log-collection" {
       template {
         destination = "local/config.alloy"
         data        = <<EOT
-// ── 0. General configurations ──────────────────────────────
+// ── General configurations ──────────────────────────────
 
 logging {
   level  = "info"
   format = "logfmt"
 }
 
-// ── 1. Discover all running Docker containers ──────────────────────────────
-discovery.docker "containers" {
-  host = "unix:///var/run/docker.sock"
+// Write to Loki
+loki.write "loki_backend" {
+  endpoint {
+    url = "http://loki.lab.${var.base_domain}:3100/loki/api/v1/push"
+  }
 }
 
-// ── 2. Relabel: extract Nomad metadata from Docker labels ──────────────────
+// ── Extract log files from all running Docker containers managed by Nomad ──────────────────────────────
+
+loki.source.file "alloc_log_files" {
+  targets    = local.file_match.alloc_logs.targets
+  forward_to = [loki.write.loki_backend.receiver]
+  tail_from_end = true    // ← skips all pre-existing content on first start
+}
+
+local.file_match "alloc_logs" {
+  path_targets = [{
+    __path__ = "/alloy/nomad/alloc/**/alloc/logs/*.std*.[0-9]*",
+    __path_exclude__ = "/alloy/nomad/alloc/**/alloc/logs/{connect-,envoy_bootstrap}*",
+    platform  = "nomad",
+    source    = "alloc_logs",
+  }]
+}
+
 discovery.relabel "nomad_containers" {
-  targets = discovery.docker.containers.targets
+  targets = local.file_match.alloc_logs.targets
 
   // Map Nomad job metadata to log labels
   rule {
@@ -101,38 +119,8 @@ discovery.relabel "nomad_containers" {
   }
 }
 
-// ── 3. Collect logs from Docker containers ─────────────────────────────────
-loki.source.docker "docker_logs" {
-  host          = "unix:///var/run/docker.sock"
-  targets       = discovery.relabel.nomad_containers.output
-  relabel_rules = discovery.relabel.nomad_containers.rules
-  labels        = { "platform" = "nomad", "type" = "container" }
- forward_to    = [loki.write.loki_backend.receiver]
-//  forward_to    = [loki.process.filter_old_docker_logs.receiver]
-}
+// ── Extract log entries from journald ──────────────────────────────
 
-// ── 4. Also tail Nomad alloc logs directly from the filesystem ────────────
-local.file_match "alloc_logs" {
-  path_targets = [{
-    __path__ = "/alloy/nomad/alloc/**/alloc/logs/*.std*.[0-9]*",
-    __path_exclude__ = "/alloy/nomad/alloc/**/alloc/logs/{connect-,envoy_bootstrap}*",
-    platform  = "nomad",
-    source    = "alloc_logs",
-  }]
-}
-
-loki.source.file "alloc_log_files" {
-  targets    = local.file_match.alloc_logs.targets
-  forward_to = [loki.write.loki_backend.receiver]
-  tail_from_end = true    // ← skips all pre-existing content on first start
-}
-
-// ── 5. Write to Loki ───────────────────────────────────────────────────────
-loki.write "loki_backend" {
-  endpoint {
-    url = "http://loki.lab.${var.base_domain}:3100/loki/api/v1/push"
-  }
-}
 
 EOT
       }
