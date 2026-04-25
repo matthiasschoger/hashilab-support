@@ -2,7 +2,7 @@ variable "base_domain" {
   default = "missing.environment.variable"
 }
 
-job "log-collection" {
+job "alloy" {
   datacenters = ["arbiter", "home", "dmz"]
   type        = "system"
 
