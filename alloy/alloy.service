@@ -1,0 +1,25 @@
+[Unit]
+Description=Grafana Alloy
+Documentation=https://grafana.com/docs/alloy/latest/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+
+ExecStart=/usr/bin/alloy run \
+    /etc/alloy/config.alloy \
+    --storage.path=/var/lib/alloy/data \
+    --server.http.listen-addr=0.0.0.0:12345 \
+    --stability.level=generally-available
+
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Restart behaviour
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

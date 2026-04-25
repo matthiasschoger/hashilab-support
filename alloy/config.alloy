@@ -1,0 +1,102 @@
+// ── Config copied over from Nomad job file ──────────────
+// ── General configurations ──────────────────────────────
+
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+loki.source.journal "debian" {
+  max_age       = "12h"
+  path          = "/var/log/journal"
+  relabel_rules = loki.relabel.journal.rules
+  forward_to    = [loki.process.journal.receiver]
+}
+
+// 2. Enrich log entries with useful labels
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    target_label  = "type"
+    replacement = "machine"
+  }
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "application"
+  }
+
+  rule {
+    source_labels = ["__journal__hostname"]
+    regex = "(.*)"
+    replacement = "$1.home"
+    target_label  = "machine"
+  }
+
+  // Syslog identifier (e.g. "sshd", "sudo", "kernel")
+  rule {
+    source_labels = ["__journal_syslog_identifier"]
+    target_label  = "syslog_identifier"
+  }
+
+  // Map numeric syslog priority to human-readable level
+  // 0=emerg 1=alert 2=crit 3=err 4=warning 5=notice 6=info 7=debug
+  rule {
+    source_labels = ["__journal__priority"]
+    regex         = "0|1|2"
+    target_label  = "level"
+    replacement   = "critical"
+  }
+  rule {
+    source_labels = ["__journal__priority"]
+    regex         = "3"
+    target_label  = "level"
+    replacement   = "error"
+  }
+  rule {
+    source_labels = ["__journal__priority"]
+    regex         = "4"
+    target_label  = "level"
+    replacement   = "warning"
+  }
+  rule {
+    source_labels = ["__journal__priority"]
+    regex         = "5|6"
+    target_label  = "level"
+    replacement   = "info"
+  }
+  rule {
+    source_labels = ["__journal__priority"]
+    regex         = "7"
+    target_label  = "level"
+    replacement   = "debug"
+  }
+}
+
+// Processing pipeline
+loki.process "journal" {
+
+  // Drop noisy or irrelevant entries — adjust to your needs
+  stage.drop {
+    source    = "unit"
+    value     = "systemd-timesyncd.service"
+    drop_counter_reason = "dropped_timesync"
+  }
+
+  // drop debug level entries in production
+  stage.drop {
+    source    = "level"
+    value     = "debug"
+    drop_counter_reason = "dropped_debug"
+  }
+
+  forward_to = [loki.write.loki_backend.receiver]
+}
+
+// Use Loki as log entry sink
+loki.write "loki_backend" {
+  endpoint {
+    url = "http://loki.lab.schoger.net:3100/loki/api/v1/push"
+  }
+}
