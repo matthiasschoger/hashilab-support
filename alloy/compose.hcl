@@ -77,7 +77,7 @@ job "alloy" {
 // ── General configurations ──────────────────────────────
 
 logging {
-  level  = "info"
+  level  = "warn"
   format = "logfmt"
 }
 
