@@ -15,7 +15,7 @@ job "alloy" {
     network {
       mode = "bridge"
 
-      port "health" { to = 9080 }
+      port "http" { to = 9080 }
     }
 
     ephemeral_disk {
@@ -25,7 +25,7 @@ job "alloy" {
     service {
       name = "alloy"
 
-      port = "health"
+      port = "http"
 
       check {
         type     = "http"
@@ -44,7 +44,11 @@ job "alloy" {
         args = [
           "run",
           "--server.http.listen-addr=0.0.0.0:9080",
-          "--storage.path=${NOMAD_ALLOC_DIR}/data",  # important to persist the current position across container re-deployments
+          "--storage.path=${NOMAD_ALLOC_DIR}/data",  # persist the current position across container re-deployments
+          "--stability.level=generally-available",
+          "--cluster.enabled=true",
+          "--cluster.advertise-address=${NOMAD_HOST_ADDR_http}",
+          "--cluster.join-addresses=alloy.lab.${var.base_domain}",
           "/local/config.alloy"
         ]
 
@@ -90,7 +94,7 @@ loki.source.docker "docker_logs" {
   host          = "unix:///var/run/docker.sock"
   targets       = discovery.relabel.nomad_containers.output
   relabel_rules = discovery.relabel.nomad_containers.rules
-  labels        = { "platform" = "nomad", "type" = "container" }
+  labels        = { "type" = "container" }
   forward_to    = [loki.write.loki_backend.receiver]
 }
 
@@ -225,6 +229,7 @@ loki.process "journal" {
 
   forward_to = [loki.write.loki_backend.receiver]
 }
+
 EOT
       }
     }

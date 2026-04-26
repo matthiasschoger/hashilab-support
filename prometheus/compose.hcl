@@ -106,6 +106,7 @@ job "prometheus" {
         args = [
                 "--config.file", "/local/prometheus/prometheus.yaml",
                 "--web.enable-otlp-receiver",
+                "--web.enable-remote-write-receiver",   // required for metric pushes from Alloy
                 "--enable-feature=promql-experimental-functions",
                 "--log.level", "warn"
                ]
