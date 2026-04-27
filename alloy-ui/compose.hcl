@@ -69,9 +69,6 @@ job "alloy-ui" {
           "--server.http.listen-addr=0.0.0.0:9080",
           "--storage.path=${NOMAD_ALLOC_DIR}/data",  # important to persist the current position over container re-deployments
           "--stability.level=experimental",          # enables Alloy UI
-          "--cluster.enabled=true",
-          "--cluster.advertise-address=alloy.lab.${var.base_domain}:9080",
-          "--cluster.join-addresses=alloy.lab.${var.base_domain}",
           "/local/config.alloy"
         ]
       }
@@ -84,7 +81,12 @@ job "alloy-ui" {
       template {
         destination = "local/config.alloy"
         data        = <<EOT
+// ── General configurations ──────────────────────────────
 
+logging {
+  level  = "warn"
+  format = "logfmt"
+}
 
 // ── Grafana Alloy — Consul-based peer discovery ──────────────────────────────
 
@@ -119,24 +121,15 @@ discovery.relabel "alloy_peers" {
     source_labels = ["__meta_consul_dc"]
     target_label  = "datacenter"
   }
-/*
-  // Ensure the port matches Alloy's HTTP listener
-  rule {
-    source_labels = ["__address__"]
-    target_label  = "__address__"
-    regex         = "([^:]+)(?::\\d+)?"
-    replacement   = "$1:12345"
-  }
-*/
 }
 
 // 3. Scrape metrics from all discovered Alloy peers
 //    This gives you a unified cluster view in Grafana
 prometheus.scrape "alloy_peers" {
 
-  clustering {
-    enabled = true
-  }
+//  clustering {
+//    enabled = true
+//  }
 
   targets         = discovery.relabel.alloy_peers.output
   forward_to      = [prometheus.remote_write.default.receiver]

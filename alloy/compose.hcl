@@ -46,9 +46,6 @@ job "alloy" {
           "--server.http.listen-addr=0.0.0.0:9080",
           "--storage.path=${NOMAD_ALLOC_DIR}/data",  # persist the current position across container re-deployments
           "--stability.level=generally-available",
-          "--cluster.enabled=true",
-          "--cluster.advertise-address=${NOMAD_HOST_ADDR_http}",
-          "--cluster.join-addresses=alloy.lab.${var.base_domain}",
           "/local/config.alloy"
         ]
 
