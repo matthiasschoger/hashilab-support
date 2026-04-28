@@ -51,7 +51,6 @@ job "alloy" {
 
         volumes = [
           "/var/log/journal:/alloy/var/log/journal:ro",
-          "/opt/nomad/data/alloc:/alloy/nomad/alloc:ro",
           "/var/run/docker.sock:/var/run/docker.sock:ro"
         ]
 
@@ -93,15 +92,6 @@ loki.source.docker "docker_logs" {
   relabel_rules = discovery.relabel.nomad_containers.rules
   labels        = { "type" = "container" }
   forward_to    = [loki.write.loki_backend.receiver]
-}
-
-local.file_match "alloc_logs" {
-  path_targets = [{
-    __path__ = "/alloy/nomad/alloc/**/alloc/logs/*.std*.[0-9]*",
-    __path_exclude__ = "/alloy/nomad/alloc/**/alloc/logs/{connect-,envoy_bootstrap}*",
-    platform  = "nomad",
-    source    = "alloc_logs",
-  }]
 }
 
 discovery.docker "containers" {
