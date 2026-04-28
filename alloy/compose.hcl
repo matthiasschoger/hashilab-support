@@ -15,7 +15,7 @@ job "alloy" {
     network {
       mode = "bridge"
 
-      port "http" { to = 9080 }
+      port "metrics" { to = 9080 }
     }
 
     ephemeral_disk {
@@ -25,7 +25,11 @@ job "alloy" {
     service {
       name = "alloy"
 
-      port = "http"
+      port = "metrics"
+
+      meta {
+        metrics_port = "${NOMAD_HOST_PORT_metrics}"
+      }
 
       check {
         type     = "http"
@@ -45,7 +49,6 @@ job "alloy" {
           "run",
           "--server.http.listen-addr=0.0.0.0:9080",
           "--storage.path=${NOMAD_ALLOC_DIR}/data",  # persist the current position across container re-deployments
-          "--stability.level=generally-available",
           "/local/config.alloy"
         ]
 

@@ -82,6 +82,19 @@ scrape_configs:
       replacement: ${1}
       target_label: instance
 
+  - job_name: alloy-host
+    static_configs:
+      - targets:
+          - 'storage.home:9080'
+          - 'proxmox0.home:9080'
+          - 'proxmox1.home:9080'
+          - 'proxmox2.home:9080'
+    relabel_configs:
+    - source_labels: [__address__] # strip port from instance name
+      regex: ([^:]+):.*
+      replacement: ${1}
+      target_label: instance
+
   - job_name: 'core-dns'
     static_configs:
       - targets:
@@ -150,6 +163,20 @@ scrape_configs:
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['node-exporter']
+    relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
+    - source_labels: [__meta_consul_node] # add ".home" to Consul node name
+      regex: (.*)
+      replacement: ${1}.home
+      target_label: instance
+
+  - job_name: alloy-consul
+    consul_sd_configs:
+    - server: 'consul.service.consul:8500'
+      services: ['alloy']
     relabel_configs:
     - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
       regex: ([^:]+)(?::\d+)?;(\d+)
