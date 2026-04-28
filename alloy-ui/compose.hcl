@@ -126,11 +126,6 @@ discovery.relabel "alloy_peers" {
 // 3. Scrape metrics from all discovered Alloy peers
 //    This gives you a unified cluster view in Grafana
 prometheus.scrape "alloy_peers" {
-
-//  clustering {
-//    enabled = true
-//  }
-
   targets         = discovery.relabel.alloy_peers.output
   forward_to      = [prometheus.remote_write.default.receiver]
   scrape_interval = "30s"
