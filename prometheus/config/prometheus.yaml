@@ -85,7 +85,6 @@ scrape_configs:
   - job_name: alloy-host
     static_configs:
       - targets:
-          - 'storage.home:9080'
           - 'proxmox0.home:9080'
           - 'proxmox1.home:9080'
           - 'proxmox2.home:9080'
