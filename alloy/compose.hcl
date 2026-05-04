@@ -53,11 +53,9 @@ job "alloy" {
         ]
 
         volumes = [
+          "/var/run/docker.sock:/var/run/docker.sock:ro",
           "/var/log/journal:/alloy/var/log/journal:ro",
-          "/var/run/docker.sock:/var/run/docker.sock:ro"
         ]
-
-        privileged = true
       }
 
       env {
@@ -66,7 +64,7 @@ job "alloy" {
 
       resources {
         cpu    = 200
-        memory = 256
+        memory = 320
       }
 
       # Alloy configuration in River/Alloy DSL
@@ -151,6 +149,11 @@ loki.relabel "journal" {
   rule {
     source_labels = ["__journal__systemd_unit"]
     target_label  = "application"
+  }
+
+  rule {
+    source_labels = ["__journal__comm"]
+    target_label  = "command"
   }
 
   rule {
