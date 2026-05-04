@@ -91,8 +91,9 @@ loki.source.docker "docker_logs" {
   host          = "unix:///var/run/docker.sock"
   targets       = discovery.relabel.nomad_containers.output
   relabel_rules = discovery.relabel.nomad_containers.rules
-  labels        = { "type" = "container" }
   forward_to    = [loki.write.loki_backend.receiver]
+
+  labels        = { "type" = "container" }
 }
 
 discovery.docker "containers" {
@@ -135,16 +136,13 @@ loki.source.journal "debian" {
   path          = "/alloy/var/log/journal"
   relabel_rules = loki.relabel.journal.rules
   forward_to    = [loki.process.journal.receiver]
+
+  labels        = { "type" = "machine" }
 }
 
 // 2. Enrich log entries with useful labels
 loki.relabel "journal" {
   forward_to = []
-
-  rule {
-    target_label  = "type"
-    replacement = "machine"
-  }
 
   rule {
     source_labels = ["__journal__systemd_unit"]
