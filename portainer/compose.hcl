@@ -33,7 +33,6 @@ job "portainer" {
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.portainer.rule=Host(`portainer.lab.${var.base_domain}`)",
-        "traefik.http.routers.portainer.entrypoints=websecure"
       ]
 
       meta {
