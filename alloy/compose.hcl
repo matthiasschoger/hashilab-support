@@ -18,10 +18,6 @@ job "alloy" {
       port "metrics" { to = 9080 }
     }
 
-    ephemeral_disk {
-      migrate = true
-    }
-
     service {
       name = "alloy"
 
@@ -47,8 +43,8 @@ job "alloy" {
 
         args = [
           "run",
-          "--server.http.listen-addr=0.0.0.0:9080",
-          "--storage.path=${NOMAD_ALLOC_DIR}/data",  # persist the current position across container re-deployments
+           "--server.http.listen-addr=0.0.0.0:9080",
+           "--storage.path=/var/lib/alloy/data",
           "/local/config.alloy"
         ]
 
@@ -74,7 +70,7 @@ job "alloy" {
 // ── General configurations ──────────────────────────────
 
 logging {
-  level  = "warn"
+  level  = "info"
   format = "logfmt"
 }
 
@@ -91,7 +87,7 @@ loki.source.docker "docker_logs" {
   host          = "unix:///var/run/docker.sock"
   targets       = discovery.relabel.nomad_containers.output
   relabel_rules = discovery.relabel.nomad_containers.rules
-  forward_to    = [loki.write.loki_backend.receiver]
+  forward_to    = [loki.process.docker.receiver]
 
   labels        = { "type" = "container" }
 }
@@ -126,6 +122,30 @@ discovery.relabel "nomad_containers" {
     regex = "(.*)"
     replacement = "$1.home"
     target_label  = "machine"
+  }
+}
+
+// filter out unnecessary noise in the log files
+loki.process "docker" {
+  forward_to = [loki.write.loki_backend.receiver]
+
+  // First: narrow down by label using a LogQL selector, MongoDB is quite opinionated about filling the log with noise
+  stage.match {
+    selector = "{group=\"mongodb\",task=\"server\"}"
+
+    // Then: drop lines containing the specific text
+    stage.drop {
+      expression          = "\"s\":\"I\",  \"c\":\"NETWORK\","      // all network messages on level "INFO"
+      drop_counter_reason = "dropped_mongodb_noise"
+    }
+    stage.drop {
+      expression          = "\"s\":\"I\",  \"c\":\"ACCESS\","       // all access messages on level "INFO"
+      drop_counter_reason = "dropped_mongodb_noise"
+    }
+    stage.drop {
+      expression          = "\"s\":\"I\",  \"c\":\"WTCHKPT\","      // all checkpoint messages on level "INFO"
+      drop_counter_reason = "dropped_mongodb_noise"
+    }
   }
 }
 
@@ -223,6 +243,21 @@ loki.process "journal" {
 
 EOT
       }
+
+      volume_mount {
+        volume      = "alloy"
+        destination = "/var/lib/alloy/data"
+      }
+    }
+
+    # Dynamic Host Volume, see https://developer.hashicorp.com/nomad/docs/stateful-workloads/dynamic-host-volumes
+    # In addition, make sure that the "alloy" host volume is registered on each node (has to be done seperately)
+    volume "alloy" {
+      type      = "host"
+      source    = "alloy"
+
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
     }
   }
 }
