@@ -79,12 +79,12 @@ server:
   http_listen_port: 3100
 
 common:
+  instance_addr: 0.0.0.0
   replication_factor: 1
+  path_prefix: {{ env "NOMAD_ALLOC_DIR" }}/data/tmp
   ring:
-    instance_addr: 127.0.0.1
     kvstore:
       store: inmemory
-  path_prefix: {{ env "NOMAD_ALLOC_DIR" }}/data/tmp
 
 ingester:
   lifecycler:
@@ -100,6 +100,11 @@ ingester:
     dir: {{ env "NOMAD_ALLOC_DIR" }}/data/wal
     flush_on_shutdown: true
     replay_memory_ceiling: "800M"
+
+pattern_ingester:
+  enabled: true
+  metric_aggregation:
+    loki_address: localhost:3100
 
 compactor:
   working_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-compactor
@@ -123,11 +128,11 @@ storage_config:
     cache_ttl: 24h         # Can be increased for faster performance over longer query periods, uses more disk space
 
 limits_config:
+  metric_aggregation_enabled: true
   reject_old_samples: true
   reject_old_samples_max_age: 168h
 
 chunk_store_config:
-#  max_look_back_period: 0s
   chunk_cache_config:
     embedded_cache:
       enabled: true
@@ -135,7 +140,15 @@ chunk_store_config:
       ttl: 24h
 
 query_range:
-  parallelise_shardable_queries: false # helps with "context canceled" messages I'm getting
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 100
+
+frontend:
+  encoding: protobuf
+
 EOT
       }
 

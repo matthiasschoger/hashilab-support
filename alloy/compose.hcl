@@ -147,6 +147,11 @@ loki.process "docker" {
       drop_counter_reason = "dropped_mongodb_noise"
     }
   }
+  stage.drop {
+    source = "application"
+    value  = "csi-nfs"
+    drop_counter_reason = "dropped_csi_nfs_noise"
+  }
 }
 
 // ── Extract log entries from journald ──────────────────────────────
