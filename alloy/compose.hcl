@@ -147,9 +147,16 @@ loki.process "docker" {
       drop_counter_reason = "dropped_mongodb_noise"
     }
   }
+  // drop csi-nfs log messages
   stage.drop {
     source = "application"
     value  = "csi-nfs"
+    drop_counter_reason = "dropped_csi_nfs_noise"
+  }
+  // drop connect proxy log messages
+  stage.drop {
+    source     = "task"
+    expression = "connect-proxy-.*"
     drop_counter_reason = "dropped_csi_nfs_noise"
   }
 }
