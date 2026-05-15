@@ -77,7 +77,8 @@ auth_enabled: false
 server:
   log_level: warn
   http_listen_port: 3100
-
+  grpc_listen_port: 9095
+  
 common:
   instance_addr: 0.0.0.0
   replication_factor: 1
