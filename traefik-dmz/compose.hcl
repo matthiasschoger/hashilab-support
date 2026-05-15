@@ -188,7 +188,7 @@ EOH
         data = <<EOH
 common:
   # log_level: debug
-  # log_level: error
+  log_level: warn
 api:
   server:
     online_client:

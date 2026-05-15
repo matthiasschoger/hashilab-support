@@ -15,7 +15,7 @@ experimental:
   plugins:
     bouncer:
       moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
-      version: v1.4.5
+      version: v1.6.0
     cloudflarewarp:
       modulename: github.com/BetterCorp/cloudflarewarp
       version: v1.3.3
