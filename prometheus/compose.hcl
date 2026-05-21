@@ -71,8 +71,7 @@ job "prometheus" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.prom-push.rule=Host(`prom-push.lab.${var.base_domain}`)",
-        "traefik.http.routers.prom-push.entrypoints=websecure"
+        "traefik.http.routers.prom-push.rule=Host(`prom-push.lab.${var.base_domain}`)"
       ]
 
       meta {
@@ -182,7 +181,7 @@ job "prometheus" {
 
       resources {
         cpu    = 100
-        memory = 24
+        memory = 36
       }
     }
   

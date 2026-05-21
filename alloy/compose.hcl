@@ -15,7 +15,10 @@ job "alloy" {
     network {
       mode = "bridge"
 
+      port "syslog"  { static = 514 }   # UDP 
       port "metrics" { to = 9080 }
+
+      port "envoy_metrics" { to = 9101 }
     }
 
     service {
@@ -45,6 +48,7 @@ job "alloy" {
           "run",
            "--server.http.listen-addr=0.0.0.0:9080",
            "--storage.path=/var/lib/alloy/data",
+           "--stability.level=experimental",      // required for syslog raw
           "/local/config.alloy"
         ]
 
@@ -60,7 +64,7 @@ job "alloy" {
 
       resources {
         cpu    = 200
-        memory = 384
+        memory = 448
       }
 
       # Alloy configuration in River/Alloy DSL
@@ -250,6 +254,49 @@ loki.process "journal" {
     drop_counter_reason = "dropped_debug"
   }
 
+  forward_to = [loki.write.loki_backend.receiver]
+}
+
+// ── Syslog receiver, wired up via ingress gateway ──────────────────────────────
+
+loki.source.syslog "homelab" {
+  listener {
+    address  = "0.0.0.0:514"
+    protocol = "udp"
+    labels   = { type = "syslog" }
+
+    syslog_format = "raw"   // Unifi uses CEF
+  }
+
+  forward_to = [loki.process.syslog.receiver]
+}
+
+loki.process "syslog" {
+  stage.regex {
+    expression = `(?P<ts>[A-Z][a-z][a-z]\s{1,2}\d{1,2}\s\d{2}[:]\d{2}[:]\d{2})\s(?P<host>[\w][\w\d\.@-]*)\s(?P<log>.*)$`
+  }
+
+  stage.labels {
+    values = { machine = "host" }
+  }
+
+  stage.timestamp {
+    source = "ts"
+    format = "Jan _2 15:04:05"
+    location = "Europe/Berlin"   // CET/CEST (handles DST automatically)
+  }
+
+  stage.static_labels {
+      values = {
+        application = "UniFi",
+        level       = "info",
+      }
+  }
+/*
+  stage.output {
+    source = "log"
+  }
+*/
   forward_to = [loki.write.loki_backend.receiver]
 }
 
