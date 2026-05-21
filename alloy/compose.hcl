@@ -257,6 +257,7 @@ loki.process "journal" {
   forward_to = [loki.write.loki_backend.receiver]
 }
 
+{{ if eq (env "NOMAD_DC") "home" }} // only render syslog code for "home" dc nodes
 // ── Syslog receiver, wired up via ingress gateway ──────────────────────────────
 
 loki.source.syslog "homelab" {
@@ -299,6 +300,7 @@ loki.process "syslog" {
 */
   forward_to = [loki.write.loki_backend.receiver]
 }
+{{ end }}
 
 EOT
       }
