@@ -205,6 +205,16 @@ scrape_configs:
     params:
       format: ['prometheus']
 
+  - job_name: nomad-state-metrics
+    consul_sd_configs:
+    - server: 'consul.service.consul:8500'
+      services: ['nomad-state-metrics']
+    relabel_configs:
+    - source_labels: [__address__, __meta_consul_service_metadata_metrics_port]
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: ${1}:${2}
+      target_label: __address__
+
   - job_name: envoy-consul
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
