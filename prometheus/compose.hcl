@@ -12,7 +12,7 @@ job "prometheus" {
       mode = "bridge"
 
       port "envoy_metrics_prometheus" { to = 9101 }
-      port "envoy_metrics_pushgateway" { to = 9102 }
+//      port "envoy_metrics_pushgateway" { to = 9102 }
     }
 
     service {
@@ -49,13 +49,13 @@ job "prometheus" {
         sidecar_task {
           resources {
             cpu    = 50
-            memory = 32
+            memory = 48
           }
         }
       }
     }
-
-    service {
+/*
+    service { // experimental service for pushes from CrowdSec, WIP
       name = "prometheus-pushgateway"
       
       port = 9091
@@ -94,7 +94,7 @@ job "prometheus" {
         }
       }
     }
-
+*/
     task "server" {
       user = "1026:100" # matthias:users
 
@@ -105,8 +105,8 @@ job "prometheus" {
         args = [
                 "--config.file", "/local/prometheus/prometheus.yaml",
                 "--web.enable-otlp-receiver",
-                "--web.enable-remote-write-receiver",   // required for metric pushes from Alloy
-                "--enable-feature=promql-experimental-functions",
+                "--web.enable-remote-write-receiver",               // required for metric pushes from Alloy
+                "--enable-feature=promql-experimental-functions",   // required for otlp support
                 "--log.level", "warn"
                ]
       }
@@ -122,7 +122,7 @@ job "prometheus" {
 
       resources {
         cpu    = 3000
-        memory = 768
+        memory = 1024
       }
 
       volume_mount {
@@ -130,7 +130,7 @@ job "prometheus" {
         destination = "/prometheus"
       }    
     }
-
+/*
     # Push gateway, see https://github.com/sa06/prometheus-pushgateway/blob/master/README.md
     #  currently used by crowdsec to push geocoded intrusion attempts
     task "push-gateway" {
@@ -153,7 +153,7 @@ job "prometheus" {
         memory = 48
       }
     }    
-
+*/
     # snmp exporter for the Synology metrics
     task "synology-exporter" {
       lifecycle {
