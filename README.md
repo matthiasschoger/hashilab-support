@@ -24,16 +24,16 @@ To keep the jobs manageable, I've split them into three repositories
 The "support" repository defines mostly operational stuff which makes it easier to manage the cluster and collect metrics about the inner workings of the whole setup. In addition, it exposes some services on the internet via Cloudflare Tunnel.
 
 - alloy - Log file aggregation via Grafana Alloy of all servers and containers into Loki.
-- cloudflare-dyndns - Small tool which get's notified by my Fritz!Box of external IP changes and updates my Cloudflare DNS accordingly
-- cloudflared - Cloudflare tunnel which exposes some services on the internet. 
+- cloudflare-dyndns - Small tool which get's notified by my Fritz!Box about external IP changes and updates my Cloudflare DNS accordingly
+- cloudflared - Cloudflare tunnel which receives external traffic from Cloudflare and routes it to traefik-dmz. 
 - diun - Update notifications when new releases are available for my services.
-cloudflared, checks for suspect patterns with crowdsec and finally routes the traffic to the exposed services in my DMZ.
 - loki - Central log file aggregation.
 - nightly-tasks - Cron jobs which do online backups of the databases via Nomad Actions.
 - node-exporter - Provides metrics of all the VMs to Prometheus.
 - pocket-id - OIDC server for SSO
-- prometheus - Metrics database, which picks up metrics from the nodes, services and Consul Connect and stores them in a time-series database. Used by Grafana to do the graph p*rn thing. Also picks up metrics about the Unifi network, Immich and my Synology NAS with the help of specific exporters.
-- traefik-dmz: Reverse proxy which picks up configurations from service annotations and routes the traffic to those services. Receives the traffic from - weekly-maintenance - Weekly job which runs clean up tasks on all my nodes.
+- prometheus - metrics database, which picks up metrics from the nodes, services and Consul Connect and stores them in a time-series database. Used by Grafana to do the graph p*rn thing. Also picks up metrics about the Unifi network, Immich and my Synology NAS with the help of specific exporters.
+- traefik-dmz: Reverse proxy which picks up configurations from service annotations, checks for suspect patterns with crowdsec and finally routes the traffic to the target services.
+- weekly-maintenance - Weekly job which runs clean up tasks on all my nodes.
 
 <h2>Deployment Notes</h2>
 
