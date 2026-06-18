@@ -7,8 +7,8 @@ global:
 storage:
   tsdb:
     out_of_order_time_window: 30m # recommeded for OTel
-    retention:
-      time: 90d                  # keep samples for three months
+#    retention:
+#      time: 90d                  # keep samples for three months
 
 otlp:
   # Recommended attributes to be promoted to labels.
@@ -38,16 +38,16 @@ rule_files:
 # metrics_path: /metrics # metrics_path defaults to '/metrics'
 # scheme defaults to 'http'.
 scrape_configs:
-  - job_name: push-gateway
-    static_configs:
-    - targets: ['localhost:9091']
-      labels:
-        service: 'prom-pushgateway'
+  # - job_name: push-gateway
+  #   static_configs:
+  #   - targets: ['localhost:9092']
+  #     labels:
+  #       service: 'prom-pushgateway'
 
   - job_name: envoy-prometheus # for the local Prometheus Consul Connect proxy, prometheus cannot connect to it's own proxy via SD
     static_configs: 
       - targets:
-          - 'localhost:9102'
+          - 'localhost:9101'
     relabel_configs:
     - source_labels: [__address__] # strip port from instance name
       regex: ([^:]+):.*
