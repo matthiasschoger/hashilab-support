@@ -7,7 +7,7 @@ job "consul-exporter" {
     network {
       mode = "bridge"
 
-      port "consul-exporter" { to = 9107 }
+      port "metrics" { to = 9107 }
     }
 
     service {
@@ -15,7 +15,7 @@ job "consul-exporter" {
       port = 9107
 
       meta {
-        metrics_port = "${NOMAD_HOST_PORT_consul-exporter}"
+        metrics_port = "${NOMAD_HOST_PORT_metrics}"
       }
     }
 
