@@ -7,8 +7,8 @@ global:
 storage:
   tsdb:
     out_of_order_time_window: 30m # recommeded for OTel
-#    retention:
-#      time: 90d                  # keep samples for three months
+    # retention:
+    #   time: 30d                  # keep samples for three months
 
 otlp:
   # Recommended attributes to be promoted to labels.
@@ -20,19 +20,6 @@ otlp:
     - cloud.region
     - container.name
   keep_identifying_resource_attributes: true
-
-# Alertmanager configuration
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-          # - alertmanager:9093
-
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-rule_files:
-  - alert.yml
-  # - "first_rules.yml"
-  # - "second_rules.yml"
 
 # scrape configurations
 # metrics_path: /metrics # metrics_path defaults to '/metrics'
