@@ -64,7 +64,7 @@ job "alloy" {
 
       resources {
         cpu    = 200
-        memory = 400
+        memory = 420
       }
 
       # Alloy configuration in River/Alloy DSL
@@ -257,7 +257,7 @@ loki.process "journal" {
   forward_to = [loki.write.loki_backend.receiver]
 }
 
-{{ if eq (env "NOMAD_DC") "home" }} // only render syslog code for "home" dc nodes
+{{ if eq (env "NOMAD_DC") "home" }} // only render syslog receiver code for "home" dc nodes (compute1 + compute2)
 // ── Syslog receiver, wired up via ingress gateway ──────────────────────────────
 
 loki.source.syslog "homelab" {
@@ -312,7 +312,7 @@ EOT
     }
 
     # Dynamic Host Volume, see https://developer.hashicorp.com/nomad/docs/stateful-workloads/dynamic-host-volumes
-    # In addition, make sure that the "alloy" host volume is registered on each node (has to be done seperately)
+    # In addition, make sure that the "alloy" host volume is registered on each node (has to be done seperately for each node)
     volume "alloy" {
       type      = "host"
       source    = "alloy"
