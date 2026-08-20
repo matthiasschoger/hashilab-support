@@ -64,7 +64,7 @@ job "alloy" {
 
       resources {
         cpu    = 200
-        memory = 450
+        memory = 500
       }
 
       # Alloy configuration in River/Alloy DSL
