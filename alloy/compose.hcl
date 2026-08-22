@@ -60,11 +60,12 @@ job "alloy" {
 
       env {
         TZ = "Europe/Berlin"
+        GOMEMLIMIT = "270MiB" // 90% max memory
       }
 
       resources {
-        cpu    = 200
-        memory = 500
+        cpu    = 400
+        memory = 300
       }
 
       # Alloy configuration in River/Alloy DSL
@@ -102,6 +103,19 @@ discovery.docker "containers" {
 
 discovery.relabel "nomad_containers" {
   targets = discovery.docker.containers.targets
+
+  // drop csi-nfs log messages
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_job_name"]
+    regex  = "csi-nfs"
+    action = "drop"
+  }
+  // drop Consul Connect proxy log messages
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_task_name"]
+    regex  = "connect-proxy-.*"
+    action = "drop"
+  }
 
   // Map Nomad job metadata to log labels
   rule {
@@ -151,24 +165,12 @@ loki.process "docker" {
       drop_counter_reason = "dropped_mongodb_noise"
     }
   }
-  // drop csi-nfs log messages
-  stage.drop {
-    source = "application"
-    value  = "csi-nfs"
-    drop_counter_reason = "dropped_csi_nfs_noise"
-  }
-  // drop connect proxy log messages
-  stage.drop {
-    source     = "task"
-    expression = "connect-proxy-.*"
-    drop_counter_reason = "dropped_csi_nfs_noise"
-  }
 }
 
 // ── Extract log entries from journald ──────────────────────────────
 
 loki.source.journal "debian" {
-  max_age       = "12h"
+  max_age       = "1h"
   path          = "/alloy/var/log/journal"
   relabel_rules = loki.relabel.journal.rules
   forward_to    = [loki.process.journal.receiver]
