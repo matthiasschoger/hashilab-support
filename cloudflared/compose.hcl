@@ -20,7 +20,7 @@ job "cloudflared" {
           name     = "cloudflared-tunnel"
           type     = "http"
           path     = "/ready"
-          interval = "10s"
+          interval = "4s"
           timeout  = "3s"
           expose   = true # required for Connect
         }

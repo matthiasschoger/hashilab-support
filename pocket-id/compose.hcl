@@ -32,13 +32,14 @@ job "pocket-id" {
           "dmz.http.routers.pocket-id.rule=Host(`oidc.${var.base_domain}`)"
         ]
 
-        check {
-          type     = "http"
-          path     = "/healthz"
-          interval = "10s"
-          timeout  = "2s"
-          expose   = true # required for Connect
-        }
+      check {
+        type     = "script"
+        command  = "sh"
+        args     = ["-c", "/app/pocket-id healthcheck"]
+        interval = "60s"
+        timeout  = "5s"
+        task     = "server"
+      }
 
         meta {
             envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul

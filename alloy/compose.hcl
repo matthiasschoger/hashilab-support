@@ -259,8 +259,8 @@ loki.process "journal" {
   forward_to = [loki.write.loki_backend.receiver]
 }
 
-{{ if eq (env "NOMAD_DC") "home" }} // only render syslog receiver code for "home" dc nodes (compute1 + compute2)
-// ── Syslog receiver, wired up via ingress gateway ──────────────────────────────
+{{ if eq (env "NOMAD_DC") "home" }} // only render syslog receiver code for ingress nodes (compute1 + compute2)
+// ── Syslog receiver, running on ingress nodes ──────────────────────────────
 
 loki.source.syslog "homelab" {
   listener {
@@ -278,9 +278,24 @@ loki.process "syslog" {
   stage.regex {
     expression = `(?P<ts>[A-Z][a-z][a-z]\s{1,2}\d{1,2}\s\d{2}[:]\d{2}[:]\d{2})\s(?P<host>[\w][\w\d\.@-]*)\s(?P<log>.*)$`
   }
+  stage.regex {
+    source     = "log"
+    expression = `^CEF:(?P<cef_version>\d+)\|(?P<device_vendor>[^|]*)\|(?P<device_product>[^|]*)\|(?P<device_version>[^|]*)\|(?P<signature_id>[^|]*)\|(?P<name>[^|]*)\|(?P<severity>[^|]*)\|(?P<cef>.*)$`
+  }
+  stage.regex {
+    source     = "cef"
+    expression = `UNIFIcategory=(?P<category>.*?) UNIFIsite=`
+  }
+  stage.regex {
+    source     = "cef"
+    expression = `UNIFIclientAlias=(?P<client_alias>.*?) UNIFIclientHostname=`
+  }
 
   stage.labels {
-    values = { machine = "host" }
+    values = { 
+      machine = "client_alias", 
+      group = "category", 
+    }
   }
 
   stage.timestamp {

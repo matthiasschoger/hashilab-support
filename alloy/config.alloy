@@ -1,4 +1,7 @@
-// ── Config copied over from Nomad job file ──────────────
+/*
+  Config copied over from Nomad job file
+  Used in stand-alone instances on bare-metal like my Proxmox hosts
+*/
 // ── General configurations ──────────────────────────────
 
 logging {
@@ -6,11 +9,103 @@ logging {
   format = "logfmt"
 }
 
+// Use Loki as log entry sink
+loki.write "loki_backend" {
+  endpoint {
+    url = "http://loki.lab.${var.base_domain}:3100/loki/api/v1/push"
+  }
+}
+
+// ── Extract log files from all running Docker containers managed by Nomad ──────────────────────────────
+
+loki.source.docker "docker_logs" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.relabel.nomad_containers.output
+  relabel_rules = discovery.relabel.nomad_containers.rules
+  forward_to    = [loki.process.docker.receiver]
+
+  labels        = { "type" = "container" }
+}
+
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "nomad_containers" {
+  targets = discovery.docker.containers.targets
+
+  // drop csi-nfs log messages
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_job_name"]
+    regex  = "csi-nfs"
+    action = "drop"
+  }
+  // drop Consul Connect proxy log messages
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_task_name"]
+    regex  = "connect-proxy-.*"
+    action = "drop"
+  }
+
+  // Map Nomad job metadata to log labels
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_job_name"]
+    target_label  = "application"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_task_group_name"]
+    target_label  = "group"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_task_name"]
+    target_label  = "task"
+  }
+  rule {
+    source_labels = ["__meta_consul_service"]
+    target_label  = "servicename"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_hashicorp_nomad_node_name"]
+    regex = "(.*)"
+    replacement = "$1.home"
+    target_label  = "machine"
+  }
+}
+
+// filter out unnecessary noise in the log files
+loki.process "docker" {
+  forward_to = [loki.write.loki_backend.receiver]
+
+  // First: narrow down by label using a LogQL selector, MongoDB is quite opinionated about filling the log with noise
+  stage.match {
+    selector = "{group=\"mongodb\",task=\"server\"}"
+
+    // Then: drop lines containing the specific text
+    stage.drop {
+      expression          = "\"s\":\"I\",  \"c\":\"NETWORK\","      // all network messages on level "INFO"
+      drop_counter_reason = "dropped_mongodb_noise"
+    }
+    stage.drop {
+      expression          = "\"s\":\"I\",  \"c\":\"ACCESS\","       // all access messages on level "INFO"
+      drop_counter_reason = "dropped_mongodb_noise"
+    }
+    stage.drop {
+      expression          = "\"s\":\"I\",  \"c\":\"WTCHKPT\","      // all checkpoint messages on level "INFO"
+      drop_counter_reason = "dropped_mongodb_noise"
+    }
+  }
+}
+
+// ── Extract log entries from journald ──────────────────────────────
+
 loki.source.journal "debian" {
-  max_age       = "12h"
-  path          = "/var/log/journal"
+  max_age       = "1h"
+  path          = "/alloy/var/log/journal"
   relabel_rules = loki.relabel.journal.rules
   forward_to    = [loki.process.journal.receiver]
+
+  labels        = { "type" = "machine" }
 }
 
 // 2. Enrich log entries with useful labels
@@ -18,13 +113,13 @@ loki.relabel "journal" {
   forward_to = []
 
   rule {
-    target_label  = "type"
-    replacement = "machine"
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "application"
   }
 
   rule {
-    source_labels = ["__journal__systemd_unit"]
-    target_label  = "application"
+    source_labels = ["__journal__comm"]
+    target_label  = "command"
   }
 
   rule {
@@ -92,11 +187,4 @@ loki.process "journal" {
   }
 
   forward_to = [loki.write.loki_backend.receiver]
-}
-
-// Use Loki as log entry sink
-loki.write "loki_backend" {
-  endpoint {
-    url = "http://loki.lab.schoger.net:3100/loki/api/v1/push"
-  }
 }

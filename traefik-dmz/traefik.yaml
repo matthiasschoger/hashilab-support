@@ -29,6 +29,7 @@ entryPoints:
         - cloudflarewarp@file # will rewrite the ClientHost field in the access log with the real IP of the client
         - crowdsec@file       # crowdsec bouncer
         - secureHeaders@file  # security headers, including CSP
+      aliasHeadersStrategy: reject  # see https://blog.lrvt.de/hardening-traefik-against-header-alias-spoofing/
     forwardedHeaders:
       trustedIPs:
         - 127.0.0.1/32 # localhost because of Consul Connect SDN
@@ -44,7 +45,6 @@ tls:
 
 api:
   dashboard: true
-  insecure: true
 
 ping:
   entryPoint: "traefik"
