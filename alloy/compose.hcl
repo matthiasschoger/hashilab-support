@@ -149,7 +149,7 @@ loki.process "docker" {
 
   // First: narrow down by label using a LogQL selector, MongoDB is quite opinionated about filling the log with noise
   stage.match {
-    selector = "{group=\"mongodb\",task=\"server\"}"
+    selector = "{group=\"mongodb\",task=\"mongodb\"}"
 
     // Then: drop lines containing the specific text
     stage.drop {
