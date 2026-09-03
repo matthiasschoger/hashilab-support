@@ -1,7 +1,7 @@
 # my global config
 global:
   scrape_interval: 30s # Set the scrape interval to every 30 seconds. Default is every 1 minute.
-  evaluation_interval: 1m # Evaluate rules every 15 seconds. The default is every 1 minute.
+  evaluation_interval: 1m # Evaluate rules every minute. The default is every 1 minute.
   # scrape_timeout is set to the global default (10s).
 
 storage:
@@ -32,6 +32,7 @@ scrape_configs:
   #       service: 'prom-pushgateway'
 
   - job_name: envoy-prometheus # for the local Prometheus Consul Connect proxy, prometheus cannot connect to it's own proxy via SD
+    scrape_interval: 5s # higher sample frequency than default
     static_configs: 
       - targets:
           - 'localhost:9101'
@@ -174,6 +175,7 @@ scrape_configs:
       target_label: instance
 
   - job_name: nomad
+    scrape_interval: 5s # higher sample frequency than default
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['nomad-client', 'nomad']
@@ -193,6 +195,7 @@ scrape_configs:
       format: ['prometheus']
 
   - job_name: consul-exporter
+    scrape_interval: 5s # higher sample frequency than default
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['consul-exporter']
@@ -203,6 +206,7 @@ scrape_configs:
       target_label: __address__
 
   - job_name: envoy-consul
+    scrape_interval: 5s # higher sample frequency than default
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
     relabel_configs:
@@ -235,6 +239,7 @@ scrape_configs:
       target_label: "service_name"
 
   - job_name: 'traefik'
+    scrape_interval: 5s # higher sample frequency than default
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['traefik-home-api','traefik-dmz-api']
@@ -254,6 +259,7 @@ scrape_configs:
       target_label: service_name
 
   - job_name: 'traefik-crowdsec'
+    scrape_interval: 5s # higher sample frequency than default
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['traefik-dmz-api']
@@ -268,6 +274,7 @@ scrape_configs:
       target_label: instance
 
   - job_name: 'cloudflared'
+    scrape_interval: 5s # higher sample frequency than default
     consul_sd_configs:
     - server: 'consul.service.consul:8500'
       services: ['ingress-cloudflare']
@@ -282,6 +289,7 @@ scrape_configs:
       target_label: instance
 
   - job_name: 'unifipoller'
+    scrape_interval: 5s # higher sample frequency than default
     consul_sd_configs:
       - server: 'consul.service.consul:8500'
         services: ['unifi-network-unpoller']
@@ -308,7 +316,6 @@ scrape_configs:
       regex: ([^:]+):.*
       replacement: ${1}
       target_label: instance
-
 
   - job_name: 'n8n'
     consul_sd_configs:

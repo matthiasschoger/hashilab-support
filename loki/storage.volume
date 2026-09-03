@@ -11,9 +11,9 @@ capability {
 
 context {
   server = "storage.home"
-  share = "/volume1/homelab-hdd"
+  share = "/volume2/homelab"
   subDir = "loki"
-  mountPermissions = "755"
+#  mountPermissions = "755"
 }
 
 mount_options {
