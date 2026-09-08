@@ -14,7 +14,9 @@ job "loki" {
     network {
       mode = "bridge"
 
-      port "envoy_metrics_loki" { to = 9102 }
+      port "metrics" { to = 3100 }
+
+      port "envoy_metrics" { to = 9102 }
     }
 
     service {
@@ -31,7 +33,8 @@ job "loki" {
       }
 
       meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_loki}" # make envoy metrics port available in Consul
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
+        metrics_port = "${NOMAD_HOST_PORT_metrics}" # make Loki metrics port available in Consul
       }
       connect {
         sidecar_service {
@@ -91,12 +94,6 @@ ingester:
   lifecycler:
     address: 127.0.0.1
     final_sleep: 0s
-  # Any chunk not receiving new logs in this time will be flushed
-  chunk_idle_period: 1h
-  # All chunks will be flushed when they hit this age, default is 1h
-  max_chunk_age: 1h
-  # Loki will attempt to build chunks up to 1.5MB, flushing if chunk_idle_period or max_chunk_age is reached first
-  chunk_target_size: 1048576
   wal:
     dir: {{ env "NOMAD_ALLOC_DIR" }}/data/wal
     flush_on_shutdown: true
@@ -121,8 +118,10 @@ schema_config:
         period: 24h
 
 storage_config:
-  filesystem:
-    directory: /loki/chunks
+  use_thanos_objstore: true
+  object_store:
+    filesystem:
+      dir: /loki/chunks
   tsdb_shipper:
     active_index_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-active
     cache_location: {{ env "NOMAD_ALLOC_DIR" }}/data/tsdb-shipper-cache
@@ -139,13 +138,6 @@ chunk_store_config:
       enabled: true
       max_size_mb: 1000
       ttl: 24h
-
-query_range:
-  results_cache:
-    cache:
-      embedded_cache:
-        enabled: true
-        max_size_mb: 100
 
 frontend:
   encoding: protobuf
