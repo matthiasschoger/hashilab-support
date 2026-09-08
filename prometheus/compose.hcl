@@ -157,7 +157,7 @@ job "prometheus" {
     # snmp exporter for the Synology metrics
     task "synology-exporter" {
       lifecycle {
-        hook = "prestart"
+        hook = "poststart"
         sidecar = true
       }
 
@@ -184,7 +184,32 @@ job "prometheus" {
         memory = 36
       }
     }
-  
+
+     // fixes permission on the mounted iSCSI storage volume
+    task "fix-permissions" {
+      driver = "docker"
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+
+      config {
+        image   = "busybox:latest"
+        command = "chown"
+        args    = ["-R", "1026:100", "/prometheus"]
+      }
+
+      volume_mount {
+        volume      = "prometheus"
+        destination = "/prometheus"
+      }
+
+      resources {
+        cpu    = 50
+        memory = 32
+      }
+    }
+
     volume "prometheus" {
       type            = "csi"
       source          = "prometheus"

@@ -1,0 +1,23 @@
+# Register volume with
+#  nomad volume register example.volume
+type      = "csi"
+id        = "prometheus"
+name      = "Prometheus"
+plugin_id = "iscsi"
+
+capacity_min = "10GiB"
+capacity_max = "15GiB"
+
+capability {
+  access_mode     = "single-node-writer"
+  attachment_mode = "file-system"
+}
+
+mount_options {
+  fs_type     = "btrfs"
+  mount_flags = ["noatime"]
+}
+
+parameters {
+  location = "/volume2"
+}
