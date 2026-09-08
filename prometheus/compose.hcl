@@ -96,9 +96,8 @@ job "prometheus" {
     }
 */
     task "server" {
-      user = "1026:100" # matthias:users
-
       driver = "docker"
+
       config {
         image = "prom/prometheus:latest"
 
@@ -154,7 +153,7 @@ job "prometheus" {
       }
     }    
 */
-    # snmp exporter for the Synology metrics
+    // snmp exporter for the Synology metrics
     task "synology-exporter" {
       lifecycle {
         hook = "poststart"
@@ -196,7 +195,7 @@ job "prometheus" {
       config {
         image   = "busybox:latest"
         command = "chown"
-        args    = ["-R", "1026:100", "/prometheus"]
+        args    = ["-R", "nobody:nobody", "/prometheus"]
       }
 
       volume_mount {
